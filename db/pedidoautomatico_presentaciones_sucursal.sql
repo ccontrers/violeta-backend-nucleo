@@ -1,0 +1,42 @@
+/*M!999999\- enable the sandbox mode */ 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `pedidoautomatico_presentaciones_sucursal`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pedidoautomatico_presentaciones_sucursal` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `sucursal` varchar(2) NOT NULL,
+  `producto` varchar(8) NOT NULL,
+  `present` varchar(13) NOT NULL,
+  `proveedor` varchar(11) DEFAULT NULL,
+  `duracionreorden` smallint(5) unsigned DEFAULT NULL,
+  `multiplopedir` varchar(10) DEFAULT NULL,
+  `stock` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `sucursal` (`sucursal`,`producto`,`present`) USING BTREE,
+  KEY `fk_art_pedidoautomaticoxsuc` (`multiplopedir`),
+  KEY `fk_prov_pedidoautomaticoxsuc` (`proveedor`),
+  KEY `´fk_present_pedidoautomaticoxsuc´` (`producto`,`present`),
+  CONSTRAINT `fk_art_pedidoautomaticoxsuc` FOREIGN KEY (`multiplopedir`) REFERENCES `articulos` (`articulo`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_prov_pedidoautomaticoxsuc` FOREIGN KEY (`proveedor`) REFERENCES `proveedores` (`proveedor`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_suc_pedidoautomaticoxsuc` FOREIGN KEY (`sucursal`) REFERENCES `sucursales` (`sucursal`) ON UPDATE CASCADE,
+  CONSTRAINT `´fk_present_pedidoautomaticoxsuc´` FOREIGN KEY (`producto`, `present`) REFERENCES `presentaciones` (`producto`, `present`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
