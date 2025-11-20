@@ -71,12 +71,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000",    // React dev anterior
-            "http://localhost:8080",    // Frontend Angular/Vue en dev
-            "http://localhost:5173",    // Shell module federation
-            "http://localhost:5174",    // Remote principal
-            "http://localhost:5175",    // Remote secundario
-            "http://localhost:5986"     // Backend
+            "http://localhost:3120",    // React dev anterior
+            "http://localhost:6820"     // Backend
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
