@@ -13,22 +13,54 @@ Alcance: backend Java / Spring Boot del proyecto VioletaServer.
 ### Estructura Actual
 ```
 src/main/java/com/lavioleta/desarrollo/violetaserver/
-├── controller/          # REST Controllers
-│   ├── LoginController.java
-│   ├── CatalogoClientesController.java
-│   ├── BusquedaArticulosController.java
-│   └── BusquedaClientesController.java
+├── config
 ├── security/            # Filtros y utilidades de autenticación/JWT
 │   ├── JwtAuthenticationFilter.java
 │   └── JwtTokenProvider.java
-├── service/             # Business logic
-│   ├── LoginService.java
-│   ├── CatalogoClientesService.java
-│   └── impl/            # Service implementations
-├── repository/          # Data access (SQL only)
-├── dto/                 # Data Transfer Objects
-│   ├── request/
-│   └── response/
+├── Busquedas
+│   ├── BusquedaCli
+│   │   ├── controller/          # REST Controllers
+│   │   │   └── BusquedaClientesController.java
+│   │   ├── service/             # Business logic
+│   │   │   ├── BusquedaClientesService.java
+│   │   │   └── impl/            # Service implementations
+│   │   ├── repository/          # Data access (SQL only)
+│   │   │   └── BusquedaProveedoresRepository.java
+│   │   ├── dto/                 # Data Transfer Objects
+│   │   │   ├── request/
+│   │   │   └── response/
+│   ├── BusquedaProv
+│   │   ├── controller/          # REST Controllers
+│   │   │   └── BusquedaProveedoresController.java
+│   │   ├── service/             # Business logic
+│   │   │   ├── BusquedaProveedoresService.java
+│   │   │   └── impl/            # Service implementations
+│   │   ├── repository/          # Data access (SQL only)
+│   │   │   └── BusquedaProveedoresRepository.java
+│   │   └── dto/                 # Data Transfer Objects
+│   │       ├── request/
+│   │       └── response/
+│   ├── Busqueda...
+│   ...
+├── Sistema
+│   ├── Acceso
+│   │    ├── controller/          # REST Controllers
+│   │    │   ├── AccesoController.java
+│   │    │   ├── BitAccesoController.java
+│   │    │   ├── ...
+│   │    │   └── ...
+│   │    ├── service/             # Business logic
+│   │    │   ├── AccesoService.java
+│   │    │   ├── BitAccesoService.java
+│   │    │   ├── ...
+│   │    │   └── impl/            # Service implementations
+│   │    ├── repository/          # Data access (SQL only)
+│   │    └── dto/                 # Data Transfer Objects
+│   │        ├── request/
+│   │        └── response/
+│   ├── Precalculos
+│   ...
+├── ...
 ├── entity/              # Entidades JPA (cuando aplica)
 ├── exception/           # Global exception handling
 ├── config/              # Configuration beans (CORS, Security, etc.)
