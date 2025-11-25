@@ -1,0 +1,141 @@
+**Flujo de desarrollo con IA para migración del backend de
+VioletaServidor**
+
+ 
+
+**Criterio actual, un agente de IA enfocado al desarrollo es un
+programador muy ágil, con mucho conocimiento técnico en especial sobre
+los dominios más populares, pero le falta visión, empatía, tiene límite
+de contexto y en dominios técnicos poco populares no es tan eficiente,
+por lo que tendremos que complementar dichas áreas, darle reglas donde
+veamos que falla más y darle tareas de horizonte corto.**
+
+1.- Agregar a la ruta del proyecto los archivos que consideremos que
+servirán para usarse como contexto. Debemos considerar agregar lo que
+sea conveniente que la IA considere que sea útil para la conversación o
+para refinar la especificación.
+
+ \* Copiar los forms y clases legadas faltantes a la carpeta .\\cpp
+
+\* Copiar documentos de especificación  de backend, frontend, tipos de
+módulos, seguridad, etc. que sean necesarios.
+
+ Carpetas:
+
+.\\docs
+
+.\\.github
+
+.\\db
+
+2.- Abrir el proyecto en VS code con la extensión Github Copilot activa.
+
+                Ejemplo: c:\\github\\violetaserver
+
+ 3.- Crear un prompt para generar una especificación detallada de la
+función legada que se va a migrar. Se puede basar en otro prompt con
+funcionalidad similar.
+
+ Ejemplo: Se edita el documento y se cambia lo que sea diferente para el
+módulo que pensamos migrar, por ejemplo
+\\genera_specs_legacy_busqueda\\vendedores.md(https://proveedores.md)
+
+ 4.- Indicarle a Copilot que revise un prompt que genera un archivo de
+especificación de la parte legada.
+
+ En github copilot con el modelo GPT-5 (codex) en modo agente:
+
+PROMPT:  Revisa el siguiente documento y corrígelo interactuando conmigo
+sobre los hallazgos para hacer el documento lo más preciso y completo
+posible, también evalúa que no haya archivos faltantes o ambigüedad:
+\\genera_specs_legacy_busqueda\\vendedores.md(https://vendedores.md)
+
+5.- Indicarle a Copilot que genere un archivo de especificación tipo
+markdown con base a la especificación que mandemos, indicando que debe
+ser una especificación técnica que tiene como objetivo un programado que
+va a implementar la aplicación.
+
+ En github copilot con el modelo GPT-5 (codex) en modo agente:
+
+PROMPT: Ejecuta las tareas indicadas en el documento siguiente:  
+.github\\prompts\\genera_specs_legacy_busqueda\\vendedores.md (https://vendedores.md)
+
+ 6.- Revisar el archivo generado especificación y pulir lo que sea
+necesario.
+
+Ejemplo revisar
+[spec-legacy-busqueda-vendedores.md](https://spec-legacy-busqueda-vendedores.md)
+
+ 7.- Crear un prompt para detallas los comandos de migración de la
+función legada que se va a migrar. Se puede basar en una plantilla de un
+módulo con funcionalidad similar.
+
+ Se edita el documento y se cambia lo que es diferente para el módulo
+que pensamos migrar,  
+.github\\prompts\\migrar_busqueda\_[vendedores.md](https://vendedores.md)
+
+ 8.- Indicarle a Copilot que revise el prompt para la migración.
+
+ En github copilot con el modelo GPT-5 (codex) en modo agente:
+
+PROMPT: Revisa el siguiente documento y corrígelo interactuando conmigo
+sobre los hallazgos para hacer el documento lo más preciso y completo
+posible, también evalúa que no haya archivos faltantes o ambigüedad:
+.github\\prompts\\migrar_busqueda\_[vendedores.md](https://vendedores.md)
+
+ 9.- Decirle a Copilot que implemente la migración indicada en el
+documento correspondiente:
+
+ En github copilot con el modelo CLAUDE SONNET 4.5 en modo agente:
+
+PROMPT: Ejecuta las tareas indicadas en el documento siguiente:  
+.github\\prompts\\migrar_busqueda\_[vendedores.md](https://vendedores.md)
+
+ 10.- Darle seguimiento a lo que va haciendo, pararlo si es necesario
+cuando este haciendo cosas incorrectas, aclararle y continuar.
+
+ 11.- Probar la funcionalidad y revisar el código y lo que va generando,
+e iterar en modificar lo necesario hasta completar la funcionalidad tal
+y como la queremos.
+
+ 12.- Opcionalmente iterar en alguna de las sugerencias de los próximos
+pasos solo si se considera necesario.
+
+ 
+
+------------------------------------------------------------------------
+
+ 
+
+Tips para desarrollar con Github Copilot
+
+ 
+
+- Darle keep en cada logro y comitear. Revisar lo que se comitea, para
+  detectar que la IA no haya modificado cosas fuera del alcance de su
+  tarea.
+
+- Usar los checkpoints cuando el prompt o lo que hizo copilot estuvo
+  incorrecto.
+
+- Agregar en un archivo
+  .github\\.[copilot-rules.md](https://copilot-rules.md) las
+  indicaciones generales para el proyecto, tener ya reglas
+  predeterminadas por ejemplo para scripts en python, indicaciones de
+  nuestra plataforma de desarrollo, tipo de base de datos, etc.
+
+- Interactuar con el agente, detenerlo, darle tips, preguntarle,
+  precisar. etc.
+
+- Hacer funcionalidades con alcance limitado, y hacer pruebas de uso en
+  cada paso, para corregir lo que sea necesario y comitear cada vez que
+  se logra el alcance.
+
+- Cuando un motor en particular no logra completar una tarea, revisar el
+  prompt, intentar simplificarla o usar otro motor. Chatgpt 5 y sonnet 4
+  han sido los que mejores resultados han dado
+
+- Abrir nuevos chats para cada nueva tarea diferente, con el objetivo de
+  reducir el contexto con el que tiene que trabajar el LLM.
+
+ 
