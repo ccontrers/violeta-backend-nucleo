@@ -2,8 +2,7 @@
 
 ## 1.- Copiar archivos legados del proyecto de C++
 Agregar a la ruta del proyecto los archivos que consideremos que servirán para usarse como contexto. Debemos considerar agregar lo que sea conveniente que la IA considere que sea útil para la conversación o para refinar la especificación.
-
-Copiar los forms y clases legadas a la carpeta `.cpp`
+Copiar los forms y clases legadas a la carpeta `.cpp` del proyecto de 
 
 Copiar documentos de especificación de backend, frontend, tipos de módulos, seguridad, etc. que sean necesarios.
 
@@ -12,30 +11,37 @@ Carpetas:
 
 >github
  
- >db
+>db
 
- 2.- Abrir el proyecto en VS code con la extensión Github Copilot
-activa.
 
-                Ejemplo: c:\\github\\violetaserver
 
- 3.- Crear un prompt para generar una especificación detallada de la
-función legada que se va a migrar. Se puede basar en otro prompt con
-funcionalidad similar.
+# 2.- Revisar los controles del módulo a migrar
+Pedirle a GitHub Copilot que compare los controles del módulo legado con los controles disponibles en la galería de componentes generada por Lovable. En caso de que falte algún control, agregarlo a la galería de componentes personalizada utilizando lovable. Por ejemplo:
 
- Ejemplo: Se edita el documento y se cambia lo que sea diferente para el
-módulo que pensamos migrar, por ejemplo
-\\genera_specs_legacy_busqueda\_[proveedores.md](https://proveedores.md)
+Desde el copilot situado en el proyecto de `Núcleo Frontend`:
+**Prompt para Copilot:**
+> Analiza el formulario legado `FormCatalogoUsuarios` y compáralo con los controles disponibles en la galería de componentes que es parte de este mismo proyecto. Indica si falta algún control necesario para migrar el formulario y en caso de que falte, menciona cuál es.
 
- 4.- Indicarle a Copilot que revise un prompt que genera un archivo de
-especificación de la parte legada.
+ ## Si se encuentra que falta algún control: 
+ Pedirle a Lovable que genere el control faltante y lo agregue a la galería de componentes personalizada, generando diferentes variantes y ejemplos de uso.** Por ejemplo:
 
- En github copilot con el modelo GPT-5 (codex) en modo agente:
+**1. Prompt para Lovable:**
+> Genera un componente de tipo `DataGrid` que soporte las siguientes funcionalidades: filtrado por columnas, paginación, selección múltiple de filas y edición en línea. Crea diferentes variantes del componente y ejemplos de uso para cada una.
 
-PROMPT:  Revisa el siguiente documento y corrígelo interactuando conmigo
-sobre los hallazgos para hacer el documento lo más preciso y completo
-posible, también evalúa que no haya archivos faltantes o ambigüedad:
-\\genera_specs_legacy_busqueda\_[vendedores.md](https://vendedores.md)
+**2. Integrar los componentes de Lovable**:
+Hacer pull usando SourceTree o Git Bash para traer los nuevos controles generados por Lovable a nuestro proyecto local. Verificar que los nuevos controles estén disponibles en la galería de componentes personalizada dentro del proyecto de `Núcleo Frontend`.
+
+# 3.- Crear un prompt de especificaciones frontend
+Crear un prompt para generar una especificación detallada de la función legada que se va a migrar. Se puede basar en otro prompt con funcionalidad similar.
+
+Ejemplo: Se edita el documento y se cambia lo que sea diferente para el módulo que pensamos migrar, por ejemplo `.github/prompts/genera_specs_legacy_busqueda_proveedores.md`
+
+# 4.- Revisión asistida del prompt de especificaciones frontend
+Indicarle a Copilot que revise un prompt que genera un archivo de especificación de la parte legada.
+
+En github copilot con el modelo GPT-5 (codex) en modo agente:
+
+> Revisa el siguiente documento y corrígelo interactuando conmigo sobre los hallazgos para hacer el documento lo más preciso y completo posible, también evalúa que no haya archivos faltantes o ambigüedad: `genera_specs_legacy_busqueda_vendedores.md`
 
 5.- Indicarle a Copilot que genere un archivo de especificación tipo
 markdown con base a la especificación que mandemos, indicando que debe
