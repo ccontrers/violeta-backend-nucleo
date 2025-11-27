@@ -1,32 +1,18 @@
-**Flujo de desarrollo con IA para migración del FRONTEND de
-VioletaCliente**
+# Flujo de desarrollo con IA para migración del FRONTEND de VioletaCliente
 
- 
+## 1.- Copiar archivos legados del proyecto de C++
+Agregar a la ruta del proyecto los archivos que consideremos que servirán para usarse como contexto. Debemos considerar agregar lo que sea conveniente que la IA considere que sea útil para la conversación o para refinar la especificación.
 
-**Criterio actual, un agente de IA enfocado al desarrollo es un
-programador muy ágil, con mucho conocimiento técnico en especial sobre
-los dominios más populares, pero le falta visión, empatía, tiene límite
-de contexto y en dominios técnicos poco populares no es tan eficiente,
-por lo que tendremos que complementar dichas áreas, darle reglas donde
-veamos que falla más y darle tareas de horizonte corto.**
+Copiar los forms y clases legadas a la carpeta `.cpp`
 
- 1.- Agregar a la ruta del proyecto los archivos que consideremos que
-servirán para usarse como contexto. Debemos considerar agregar lo que
-sea conveniente que la IA considere que sea útil para la conversación o
-para refinar la especificación.
+Copiar documentos de especificación de backend, frontend, tipos de módulos, seguridad, etc. que sean necesarios.
 
- \* Copiar los forms y clases legadas a la carpeta .\\cpp
+Carpetas:
+>docs
 
-\* Copiar documentos de especificación  de backend, frontend, tipos de
-módulos, seguridad, etc. que sean necesarios.
-
- Carpetas:
-
-.\\docs
-
- .\\.github
-
-.\\db
+>github
+ 
+ >db
 
  2.- Abrir el proyecto en VS code con la extensión Github Copilot
 activa.

@@ -3,12 +3,7 @@
  
 
 ## Criterio actual
-Un agente de IA enfocado al desarrollo es un
-programador muy ágil, con mucho conocimiento técnico en especial sobre
-los dominios más populares, pero le falta visión, empatía, tiene límite
-de contexto y en dominios técnicos poco populares no es tan eficiente,
-por lo que tendremos que complementar dichas áreas, darle reglas donde
-veamos que falla más y darle tareas de horizonte corto.
+Un agente de IA enfocado al desarrollo es un programador muy ágil, con mucho conocimiento técnico en especial sobre los dominios más populares, pero le falta visión, empatía, tiene límite de contexto y en dominios técnicos poco populares no es tan eficiente, por lo que tendremos que complementar dichas áreas, darle reglas donde veamos que falla más y darle tareas de horizonte corto.
 
 ### 1.- Preparación previa de archivos
 Agregar a la ruta del proyecto los archivos que consideremos que
@@ -22,9 +17,9 @@ para refinar la especificación.
 
  Carpetas:
 
->docs
-github
-db
+>docs: lectura para humanos o a veces para la IA
+github: Los archivos útiles para dar contexto a la IA
+db: Esquemas de base de datos
 
 ### 2.- Abrir el proyecto en VS code con la extensión Github Copilot activa.
 
@@ -59,7 +54,7 @@ En github copilot con el modelo GPT-5 (codex) en modo agente:
 Ejemplo revisar
 `spec-legacy-busqueda-vendedores.md`
 
-### 7.- Revisión de prompt de migración
+### 7.- Creación de prompt de migración
 Crear un prompt para detallar los comandos de migración de la función legada que se va a migrar. Se puede basar en una plantilla de un módulo con funcionalidad similar.
 
  Se edita el documento y se cambia lo que es diferente para el módulo
@@ -84,7 +79,8 @@ En github copilot con el modelo CLAUDE SONNET 4.5 en modo agente:
 cuando este haciendo cosas incorrectas, aclararle y continuar.
 
 ### 10.- Pruebas de la funcionalidad
-Probar la funcionalidad y revisar el código y lo que va generando, e iterar en modificar lo necesario hasta completar la funcionalidad tal y como la queremos.----------------------------------------------------------------------
+Probar la funcionalidad y revisar el código y lo que va generando, e iterar en modificar lo necesario hasta completar la funcionalidad tal y como la queremos.
+----------------------------------------------------------------------
 
 ## Tips para desarrollar con Github Copilot
 - Darle keep en cada logro y comitear. Revisar lo que se comitea, para

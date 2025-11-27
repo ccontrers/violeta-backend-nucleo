@@ -64,7 +64,7 @@ import org.springframework.context.annotation.Configuration;
                 license = @License(name = "Propietario", url = "https://lavioleta.com")
         ),
         servers = {
-                @Server(url = "http://localhost:5986", description = "Desarrollo Local")
+                @Server(url = "http://localhost:6820", description = "Desarrollo Local")
         },
         security = {
                 @SecurityRequirement(name = "cookieAuth"),
