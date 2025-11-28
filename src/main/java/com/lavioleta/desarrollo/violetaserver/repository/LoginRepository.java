@@ -82,12 +82,7 @@ public class LoginRepository {
      * Verifica si un usuario existe
      */
     public boolean usuarioExisteYActivo(String usuario) {
-        QueryBuilder queryBuilder = QueryBuilder
-            .select("COUNT(*)")
-            .from("usuarios u")
-            .where("u.empleado = ?");
-        
-        String sql = queryBuilder.build();
+        String sql = "SELECT COUNT(*) FROM usuarios u WHERE u.empleado = ?";
         
         try {
             Integer count = jdbcClient.sql(sql)
