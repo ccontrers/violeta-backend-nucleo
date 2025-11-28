@@ -406,15 +406,3 @@ cd frontend && npx playwright test  # Tests E2E
 - CI/CD pipeline completo
 
 ---
-
-## Próximos Pasos
-
-### Prioridad 1 (Esta semana)
-1. **Implementar tests unitarios backend** - CatalogoClientesRepositoryTest
-2. **Completar validaciones DTO** - Reglas @AssertTrue complejas
-3. **Documentar APIs faltantes** - Swagger/OpenAPI
-
-### Prioridad 2 (Próximo sprint)
-1. **Expandir módulos catálogos** - Proveedores, Artículos
-2. **Optimizar consultas** - Indexes, query performance
-3. **Logging avanzado** - Structured logging con trace IDs
