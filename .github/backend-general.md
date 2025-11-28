@@ -12,6 +12,8 @@ Alcance: backend Java / Spring Boot del proyecto VioletaServer.
 
 ### Estructura modelo del proyecto (Separado por entidades)
 ```
+Manteniendo una organización package-by-feature/entity
+
 src/main/java/com/lavioleta/desarrollo/violetaserver/
 ├── config
 ├── security/            # Filtros y utilidades de autenticación/JWT
@@ -312,6 +314,53 @@ public ResponseEntity<ClienteResponse> consultarCliente(@PathVariable String cod
 ```
 
 Fecha última actualización OpenAPI: 2025-10-07
+
+---
+## Endpoints para Componentes Visuales (ComboBox, Grids Secundarios)
+
+### Objetivo
+Crear endpoints REST para llenar componentes visuales del frontend como combos, grids secundarios, etc., usando endpoints existentes cuando sea posible.
+
+### Lineamientos Generales
+- **Documentación OpenAPI:** Seguir las mismas reglas establecidas
+- **Reutilización:** Verificar primero si existe un endpoint similar antes de crear uno nuevo (aprovechar estructura basada en feature/entity)
+- **Propósito claro:** Documentar específicamente para qué componente está diseñado cada endpoint
+
+### Estrategia de Implementación
+
+#### 1. **Reutilizar Endpoint Existente**
+Si un endpoint actual puede servir agregando parámetros opcionales:
+- Extender el endpoint con nuevos filtros opcionales
+- Mantener retrocompatibilidad
+- Documentar claramente los nuevos parámetros
+
+#### 2. **Crear Endpoint Específico**  
+Solo cuando los endpoints existentes de la entidad no satisfacen las necesidades de los componentes visuales (a nivel estructural).
+
+**Convención de nomenclatura:**
+```
+GET /api/v1/{entidad}/combo-box
+GET /api/v1/{entidad}/grid-secundario
+```
+
+**Ejemplo para combo básico:**
+```
+GET /api/v1/usuarios/combo-box
+Respuesta: [{"clave":"AAAA", "nombre":"Aylin A Acosta Almeja"}]
+```
+
+**Ejemplo para combo con campos adicionales:**
+```
+GET /api/v1/usuarios/combo-box-activos
+Respuesta: [{"clave":"AAAA", "nombre":"Aylin A Acosta Almeja", "activo":true}]
+```
+
+### Documentación Requerida
+- **Summary:** Especificar el tipo de componente (ej: "ComboBox de usuarios activos")
+- **Description:** Detallar campos devueltos y su propósito
+- **Responses:** Estructura clara del JSON de respuesta
+- **Parameters:** Filtros disponibles (si aplican)
+ 
 
 ---
 
