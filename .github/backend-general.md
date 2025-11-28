@@ -10,61 +10,61 @@ Alcance: backend Java / Spring Boot del proyecto VioletaServer.
 - **Búsquedas:** Artículos y Clientes (6 tipos de filtros)
 - **Configuración:** Multi-empresa, base de datos unificada
 
-### Estructura Actual
+### Estructura modelo del proyecto (Separado por entidades)
 ```
 src/main/java/com/lavioleta/desarrollo/violetaserver/
 ├── config
 ├── security/            # Filtros y utilidades de autenticación/JWT
 │   ├── JwtAuthenticationFilter.java
 │   └── JwtTokenProvider.java
-├── Busquedas
-│   ├── BusquedaCli
-│   │   ├── controller/          # REST Controllers
-│   │   │   └── BusquedaClientesController.java
-│   │   ├── service/             # Business logic
-│   │   │   ├── BusquedaClientesService.java
-│   │   │   └── impl/            # Service implementations
-│   │   ├── repository/          # Data access (SQL only)
-│   │   │   └── BusquedaProveedoresRepository.java
-│   │   ├── dto/                 # Data Transfer Objects
-│   │   │   ├── request/
-│   │   │   └── response/
-│   ├── BusquedaProv
-│   │   ├── controller/          # REST Controllers
-│   │   │   └── BusquedaProveedoresController.java
-│   │   ├── service/             # Business logic
-│   │   │   ├── BusquedaProveedoresService.java
-│   │   │   └── impl/            # Service implementations
-│   │   ├── repository/          # Data access (SQL only)
-│   │   │   └── BusquedaProveedoresRepository.java
-│   │   └── dto/                 # Data Transfer Objects
-│   │       ├── request/
-│   │       └── response/
-│   ├── Busqueda...
+├── cliente/
+│   ├── controller/          # REST Controllers
+│   │   └── ClienteController.java
+│   ├── service/             # Business logic
+│   │   ├── ClienteService.java
+│   │   └── impl/            # Service implementations
+│   ├── repository/          # Data access (SQL only)
+│   │   └── ClienteRepository.java
+│   ├── dto/                 # Data Transfer Objects
+│   │   ├── request/
+│   │   └── response/
+│   ├── entity/              # Entidades JPA (cuando aplica)
 │   ...
-├── Sistema
-│   ├── Acceso
-│   │    ├── controller/          # REST Controllers
-│   │    │   ├── AccesoController.java
-│   │    │   ├── BitAccesoController.java
+├── proveedor/
+│   ├── controller/          # REST Controllers
+│   │   └── ProveedorController.java
+│   ├── service/             # Business logic
+│   │   ├── ProveedorService.java
+│   │   └── impl/            # Service implementations
+│   ├── repository/          # Data access (SQL only)
+│   │   └── ProveedorRepository.java
+│   ├── dto/                 # Data Transfer Objects
+│   │   ├── request/
+│   │   └── response/
+|   ├── entity/              # Entidades JPA (cuando aplica)
+│   ...
+├── acceso/
+│   ├── controller/          # REST Controllers
+│   │    ├── AccesoController.java
+│   │    ├── BitAccesoController.java
 │   │    │   ├── ...
 │   │    │   └── ...
-│   │    ├── service/             # Business logic
+│   ├── service/             # Business logic
 │   │    │   ├── AccesoService.java
 │   │    │   ├── BitAccesoService.java
 │   │    │   ├── ...
 │   │    │   └── impl/            # Service implementations
-│   │    ├── repository/          # Data access (SQL only)
-│   │    └── dto/                 # Data Transfer Objects
-│   │        ├── request/
-│   │        └── response/
-│   ├── Precalculos
+│   ├── repository/          # Data access (SQL only)
+│   ├─── dto/                 # Data Transfer Objects
+│   │    ├── request/
+│   │    └── response/
+│   ├── entity/              # Entidades JPA (cuando aplica)
 │   ...
-├── ...
-├── entity/              # Entidades JPA (cuando aplica)
-├── exception/           # Global exception handling
-├── config/              # Configuration beans (CORS, Security, etc.)
-└── constant/            # App constants
+|── common/              # Clases comunes (utils, exception, etc.)
+|    ├── exception/           # Global exception handling
+|    └── constant/            # App constants 
+|
+└── config/              # Configuration beans (CORS, Security, etc.)
 
 src/main/resources/
 ├── application-*.properties  # Configuración por perfil (dev/test/prod)
@@ -168,8 +168,7 @@ public class CatalogoClientesServiceImpl {
 
 ## Testing Strategy
 
-### Estado Crítico
-⚠️ **FALTANTE URGENTE:** Tests unitarios backend (ver [`backend-testing.md`](backend-testing.md))
+Tests unitarios backend (ver [`backend-testing.md`](backend-testing.md))
 
 ### Tests E2E Existentes
 ✅ **Playwright** para catálogo de clientes:

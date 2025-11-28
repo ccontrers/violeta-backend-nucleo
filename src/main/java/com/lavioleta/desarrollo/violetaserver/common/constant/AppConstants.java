@@ -1,4 +1,4 @@
-package com.lavioleta.desarrollo.violetaserver.constant;
+package com.lavioleta.desarrollo.violetaserver.common.constant;
 
 public final class AppConstants {
     
