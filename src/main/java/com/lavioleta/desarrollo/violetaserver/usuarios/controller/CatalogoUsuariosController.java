@@ -1,4 +1,4 @@
-package com.lavioleta.desarrollo.violetaserver.controller;
+package com.lavioleta.desarrollo.violetaserver.usuarios.controller;
 
 import java.util.List;
 
@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lavioleta.desarrollo.violetaserver.dto.request.UsuarioRequest;
-import com.lavioleta.desarrollo.violetaserver.dto.response.EmpleadoOptionResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioListResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioResponse;
-import com.lavioleta.desarrollo.violetaserver.service.CatalogoUsuariosService;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.service.CatalogoUsuariosService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

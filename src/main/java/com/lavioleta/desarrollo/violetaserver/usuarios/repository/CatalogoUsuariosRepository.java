@@ -1,4 +1,4 @@
-package com.lavioleta.desarrollo.violetaserver.repository;
+package com.lavioleta.desarrollo.violetaserver.usuarios.repository;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -12,10 +12,10 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import com.lavioleta.desarrollo.violetaserver.dto.request.UsuarioRequest;
-import com.lavioleta.desarrollo.violetaserver.dto.response.EmpleadoOptionResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioListResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
 
 @Repository
 public class CatalogoUsuariosRepository {

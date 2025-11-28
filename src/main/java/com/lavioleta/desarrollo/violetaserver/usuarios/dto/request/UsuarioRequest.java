@@ -1,4 +1,4 @@
-package com.lavioleta.desarrollo.violetaserver.dto.request;
+package com.lavioleta.desarrollo.violetaserver.usuarios.dto.request;
 
 import java.time.LocalDate;
 

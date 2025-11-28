@@ -1,7 +1,8 @@
-package com.lavioleta.desarrollo.violetaserver.service;
+package com.lavioleta.desarrollo.violetaserver.acceso.service;
 
-import com.lavioleta.desarrollo.violetaserver.dto.request.LoginRequest;
-import com.lavioleta.desarrollo.violetaserver.dto.response.LoginResponse;
+import com.lavioleta.desarrollo.violetaserver.acceso.dto.request.LoginRequest;
+import com.lavioleta.desarrollo.violetaserver.acceso.dto.response.LoginResponse;
+
 import java.util.List;
 import java.util.Map;
 

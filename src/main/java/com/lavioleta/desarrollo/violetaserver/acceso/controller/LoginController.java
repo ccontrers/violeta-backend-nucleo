@@ -1,8 +1,9 @@
-package com.lavioleta.desarrollo.violetaserver.controller;
+package com.lavioleta.desarrollo.violetaserver.acceso.controller;
 
-import com.lavioleta.desarrollo.violetaserver.dto.request.LoginRequest;
-import com.lavioleta.desarrollo.violetaserver.dto.response.LoginResponse;
-import com.lavioleta.desarrollo.violetaserver.service.LoginService;
+import com.lavioleta.desarrollo.violetaserver.acceso.dto.request.LoginRequest;
+import com.lavioleta.desarrollo.violetaserver.acceso.dto.response.LoginResponse;
+import com.lavioleta.desarrollo.violetaserver.acceso.service.LoginService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;

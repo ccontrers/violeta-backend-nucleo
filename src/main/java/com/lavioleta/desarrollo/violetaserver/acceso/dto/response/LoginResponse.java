@@ -1,4 +1,4 @@
-package com.lavioleta.desarrollo.violetaserver.dto.response;
+package com.lavioleta.desarrollo.violetaserver.acceso.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

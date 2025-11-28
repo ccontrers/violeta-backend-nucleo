@@ -29,11 +29,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lavioleta.desarrollo.violetaserver.config.TestSecurityConfig;
-import com.lavioleta.desarrollo.violetaserver.dto.request.UsuarioRequest;
-import com.lavioleta.desarrollo.violetaserver.dto.response.EmpleadoOptionResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioListResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioResponse;
-import com.lavioleta.desarrollo.violetaserver.service.CatalogoUsuariosService;
+import com.lavioleta.desarrollo.violetaserver.usuarios.controller.CatalogoUsuariosController;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.service.CatalogoUsuariosService;
 
 @WebMvcTest(CatalogoUsuariosController.class)
 @Import(TestSecurityConfig.class)

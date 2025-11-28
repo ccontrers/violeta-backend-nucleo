@@ -1,4 +1,4 @@
-package com.lavioleta.desarrollo.violetaserver.dto.request;
+package com.lavioleta.desarrollo.violetaserver.acceso.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

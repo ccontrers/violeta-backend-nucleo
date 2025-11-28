@@ -1,12 +1,13 @@
-package com.lavioleta.desarrollo.violetaserver.service.impl;
+package com.lavioleta.desarrollo.violetaserver.acceso.service.impl;
 
+import com.lavioleta.desarrollo.violetaserver.acceso.dto.request.LoginRequest;
+import com.lavioleta.desarrollo.violetaserver.acceso.dto.response.LoginResponse;
+import com.lavioleta.desarrollo.violetaserver.acceso.dto.response.LoginResponse.UsuarioInfo;
+import com.lavioleta.desarrollo.violetaserver.acceso.repository.LoginRepository;
+import com.lavioleta.desarrollo.violetaserver.acceso.service.LoginService;
 import com.lavioleta.desarrollo.violetaserver.config.SecurityProperties;
-import com.lavioleta.desarrollo.violetaserver.dto.request.LoginRequest;
-import com.lavioleta.desarrollo.violetaserver.dto.response.LoginResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.LoginResponse.UsuarioInfo;
-import com.lavioleta.desarrollo.violetaserver.repository.LoginRepository;
 import com.lavioleta.desarrollo.violetaserver.security.JwtTokenProvider;
-import com.lavioleta.desarrollo.violetaserver.service.LoginService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

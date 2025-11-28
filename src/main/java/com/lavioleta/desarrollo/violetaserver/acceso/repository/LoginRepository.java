@@ -1,10 +1,11 @@
-package com.lavioleta.desarrollo.violetaserver.repository;
+package com.lavioleta.desarrollo.violetaserver.acceso.repository;
 
-import com.lavioleta.desarrollo.violetaserver.dto.response.LoginResponse.UsuarioInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+
+import com.lavioleta.desarrollo.violetaserver.acceso.dto.response.LoginResponse.UsuarioInfo;
 
 import java.util.*;
 

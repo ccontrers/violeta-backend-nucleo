@@ -1,11 +1,11 @@
-package com.lavioleta.desarrollo.violetaserver.service;
+package com.lavioleta.desarrollo.violetaserver.usuarios.service;
 
 import java.util.List;
 
-import com.lavioleta.desarrollo.violetaserver.dto.request.UsuarioRequest;
-import com.lavioleta.desarrollo.violetaserver.dto.response.EmpleadoOptionResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioListResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
 
 /**
  * API del servicio para el catálogo de usuarios legado (Consulta/Graba/Baja).

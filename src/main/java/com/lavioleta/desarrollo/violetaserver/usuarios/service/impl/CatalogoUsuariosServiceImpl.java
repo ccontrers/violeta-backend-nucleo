@@ -1,4 +1,4 @@
-package com.lavioleta.desarrollo.violetaserver.service.impl;
+package com.lavioleta.desarrollo.violetaserver.usuarios.service.impl;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.lavioleta.desarrollo.violetaserver.dto.request.UsuarioRequest;
-import com.lavioleta.desarrollo.violetaserver.dto.response.EmpleadoOptionResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioListResponse;
-import com.lavioleta.desarrollo.violetaserver.dto.response.UsuarioResponse;
-import com.lavioleta.desarrollo.violetaserver.repository.CatalogoUsuariosRepository;
-import com.lavioleta.desarrollo.violetaserver.service.CatalogoUsuariosService;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.repository.CatalogoUsuariosRepository;
+import com.lavioleta.desarrollo.violetaserver.usuarios.service.CatalogoUsuariosService;
 
 @Service
 public class CatalogoUsuariosServiceImpl implements CatalogoUsuariosService {
