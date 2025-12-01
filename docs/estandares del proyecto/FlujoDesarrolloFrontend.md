@@ -22,7 +22,7 @@ Desde el copilot situado en el proyecto de `Núcleo Frontend`:
 **Prompt para Copilot:**
 > Analiza el formulario legado `FormCatalogoUsuarios` y compáralo con los controles disponibles en la galería de componentes que es parte de este mismo proyecto. Indica si falta algún control necesario para migrar el formulario y en caso de que falte, menciona cuál es.
 
- ## Si se encuentra que falta algún control: 
+ ### Si se encuentra que falta algún control: 
  Pedirle a Lovable que genere el control faltante y lo agregue a la galería de componentes personalizada, generando diferentes variantes y ejemplos de uso.** Por ejemplo:
 
 **1. Prompt para Lovable:**
@@ -38,6 +38,8 @@ Este prompt debería incluir:
 - Instrucciones específicas para explorar el código fuente de la interfaz legada y la función backend correspondiente.
 - Contexto adicional relevante (documentación del código legado, definiciones de tablas en SQL).
 - Un esquema claro del contenido esperado en el documento de especificación.
+- Una referencia a la estructura actualizada de peticiones y respuestas de la API de núcleo backend migrado **mencionando los endpoints (o el prefijo de la URL) que se usará¨**. Para ello es necesario actualizar el archivo `docs/api-docs.json` exportando desde Swagger la definición actualizada de la API.
+- Una referencia a los nuevos componentes que se usarán en la migración, mencionando la galería de componentes (**solamente en caso de que se espere que no se deduzca adecuadamente por la IA**, probablemente no sea necesario si ya se hizo el paso 2 correctamente).
 
 Ejemplo: Se edita el documento y se cambia lo que sea diferente para el módulo que pensamos migrar, por ejemplo `.github/prompts/genera_specs_legacy_busqueda_proveedores.md`
 
@@ -48,12 +50,8 @@ En github copilot con el modelo GPT-5 (codex) en modo agente:
 
 > Revisa el siguiente documento y corrígelo interactuando conmigo sobre los hallazgos para hacer el documento lo más preciso y completo posible, también evalúa que no haya archivos faltantes o ambigüedad: `genera_specs_legacy_busqueda_vendedores.md`
 
-## 5.- Generar el archivo de especificación frontend
+## 5.- Ejecutar el prompt de especificación frontend
 Indicarle a Copilot que genere un archivo de especificación tipo markdown con base a la especificación que mandemos, indicando que debe ser una especificación técnica que tiene como objetivo un programado que va a implementar la aplicación.
-
-Este prompt debería incluir:
-- Una referencia a la estructura actualizada de peticiones y respuestas de la API de núcleo backend migrado **mencionando los endpoints (o el prefijo de la URL) que se usará¨**. Para ello es necesario actualizar el archivo `docs/api-docs.json` exportando desde Swagger la definición actualizada de la API.
-- Una referencia a los nuevos componentes que se usarán en la migración, mencionando la galería de componentes (**solamente en caso de que se espere que no se deduzca adecuadamente por la IA**, probablemente no sea necesario si ya se hizo el paso 2 correctamente).
 
 En github copilot con el modelo GPT-5 (codex) en modo agente:
 
