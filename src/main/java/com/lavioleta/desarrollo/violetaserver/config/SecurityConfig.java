@@ -73,7 +73,9 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(List.of(
             "http://localhost:3120",        // React dev anterior
             "http://localhost:6820",        // Backend
-            "https://*.lovable.app"  // Frontend desplegado (subdominios dinámicos)
+            "https://*.lovable.app",  // Frontend desplegado (subdominios dinámicos)
+            "https://*.lovable.dev",  // Frontend desplegado (subdominios dinámicos)
+            "https://*.lovableproject.com"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
