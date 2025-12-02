@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioComboOptionResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
 
@@ -23,4 +24,6 @@ public interface CatalogoUsuariosService {
     UsuarioResponse eliminarUsuario(String empleado);
 
     List<EmpleadoOptionResponse> obtenerEmpleadosDisponibles();
+
+    List<UsuarioComboOptionResponse> listarUsuariosCombo(String sucursal);
 }
