@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioComboOptionResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
 
@@ -127,6 +128,36 @@ public class CatalogoUsuariosRepository {
                 .query(Integer.class)
                 .single();
         return count != null && count > 0;
+    }
+
+    public List<UsuarioComboOptionResponse> listarUsuariosCombo(String sucursal) {
+        StringBuilder sql = new StringBuilder()
+                .append("SELECT u.empleado, ")
+                .append("       TRIM(CONCAT_WS(' ', e.nombre, e.appat, e.apmat)) AS nombreCompleto, ")
+                .append("       e.sucursal AS sucursal ")
+                .append("FROM usuarios u ")
+                .append("JOIN empleados e ON e.empleado = u.empleado ");
+
+        List<Object> params = new ArrayList<>();
+        if (StringUtils.hasText(sucursal)) {
+            sql.append("WHERE e.sucursal = ? ");
+            params.add(sucursal.trim());
+        }
+
+        sql.append("ORDER BY e.nombre, e.appat, e.apmat");
+
+        var statement = jdbcClient.sql(sql.toString());
+        for (Object param : params) {
+            statement = statement.param(param);
+        }
+
+        return statement
+                .query((rs, rowNum) -> UsuarioComboOptionResponse.builder()
+                        .empleado(rs.getString("empleado"))
+                        .nombreCompleto(rs.getString("nombreCompleto"))
+                        .sucursal(rs.getString("sucursal"))
+                        .build())
+                .list();
     }
 
     public int insertarUsuario(UsuarioRequest request, String sucursal) {
