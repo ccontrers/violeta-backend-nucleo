@@ -72,6 +72,12 @@ public class ClaveUsuarioServiceImpl implements ClaveUsuarioService {
             return ClaveResponse.error("La clave actual no es correcta");
         }
 
+        // Verificar que la nueva clave no sea igual a la actual
+        if (request.getClaveActual().equalsIgnoreCase(request.getNuevaClave())) {
+            log.warn("Usuario {} intentó cambiar a la misma clave", empleado);
+            return ClaveResponse.error("La nueva clave no puede ser igual a la clave actual");
+        }
+
         // Ejecutar el cambio de clave (equivalente al UPDATE del legado)
         int filasAfectadas = repository.cambiarClave(empleado, request.getClaveActual(), request.getNuevaClave());
 
