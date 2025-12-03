@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -36,7 +37,7 @@ public class SecurityConfig {
             // Deshabilitar CSRF (necesario para APIs REST)
             .csrf(csrf -> csrf.disable())
             
-            // Configurar CORS
+            // Configurar CORS - IMPORTANTE: debe estar antes de authorizeHttpRequests
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             
             // Configuración de sesiones: IF_REQUIRED permite tanto JWT como sesiones
@@ -46,8 +47,17 @@ public class SecurityConfig {
                 .maxSessionsPreventsLogin(false)
             )
             
+            // Habilitar lectura del SecurityContext desde la sesión HTTP
+            // (Requerido en Spring Security 6.x para autenticación basada en sesión)
+            .securityContext(securityContext -> securityContext
+                .requireExplicitSave(false) // Guardar automáticamente el contexto en sesión
+            )
+            
             // Autorización de endpoints
             .authorizeHttpRequests(auth -> auth
+                // CORS preflight: permitir todas las peticiones OPTIONS sin autenticación
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                
                 // Endpoints públicos
                 .requestMatchers(
                     "/api/v1/auth/**",           // Login y logout
@@ -80,7 +90,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // Importante para cookies
-        configuration.setExposedHeaders(List.of("Authorization")); // Exponer header con JWT
+        configuration.setExposedHeaders(List.of("Authorization", "Set-Cookie")); // Exponer headers necesarios
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
