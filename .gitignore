@@ -1,6 +1,7 @@
 *.log
 *.gz
 *.rar
+*.tmp
 *.zip
 HELP.md
 .gradle
