@@ -17,6 +17,7 @@ Esta guía resume cómo interactuar con los servicios REST ubicados en `/api/v1/
 | GET | `/api/v1/security/privilegios/version/requerimientos` | Versión mínima requerida por el backend. | Usuario autenticado |
 | POST | `/api/v1/security/privilegios/cache/flush` | Invalidación global de caché. | `ROLE_ADMIN` o `SECURITY_CACHE_FLUSH` |
 | DELETE | `/api/v1/security/privilegios/cache/{usuario}` | Invalidación de caché para un usuario específico. | `ROLE_ADMIN` o `SECURITY_CACHE_FLUSH` |
+| DELETE | `/api/v1/security/privilegios/cache/self` | Invalidación de caché del usuario autenticado. | Usuario autenticado |
 
 ## Payloads y respuestas
 ### Objeto `ObjetoPrivilegiosDTO`
@@ -126,8 +127,16 @@ curl -X DELETE \
 ```
 Respuesta: `204 No Content`
 
+### 7. Invalidar caché propio después de autenticarse
+```bash
+curl -X DELETE \
+  -H "Authorization: Bearer token-demo" \
+  http://localhost:6820/api/v1/security/privilegios/cache/self
+```
+Respuesta: `204 No Content`
+
 ## Buenas prácticas
 - Consumir `GET /privilegios` al iniciar sesión en el frontend para precargar menús y permisos.
 - Usar `GET /{objeto}/{privilegio}` cuando se requiera validar acciones específicas sin transferir toda la lista.
-- Después de modificar privilegios en la base de datos, invocar `DELETE /cache/{usuario}` para que el cambio sea efectivo de inmediato.
+- Después de modificar privilegios en la base de datos, invocar `DELETE /cache/{usuario}` (admin) o pedir a la persona que ejecute `DELETE /cache/self` para liberar su caché.
 - Registrar cada consumo administrativo; estos endpoints impactan a todos los nodos de la aplicación mediante la invalidez del caché.
