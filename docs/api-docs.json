@@ -15,68 +15,66 @@
     },
     "servers": [
         {
-            "url": "http://localhost:5986",
+            "url": "http://localhost:6820",
             "description": "Desarrollo Local"
         }
     ],
     "security": [
         {
-            "cookieAuth": [
-            ]
+            "cookieAuth": []
         },
         {
-            "bearerAuth": [
-            ]
+            "bearerAuth": []
         }
     ],
     "tags": [
         {
-            "name": "Catálogo Clientes",
-            "description": "Gestión CRUD y datos asociados de clientes"
-        },
-        {
-            "name": "Búsquedas Clientes",
-            "description": "Operaciones de búsqueda de clientes por criterios."
+            "name": "Catálogo de Usuarios",
+            "description": "Endpoints migrados desde FormCatalogoUsuarios"
         },
         {
             "name": "Autenticación",
             "description": "Endpoints para login y recursos iniciales"
         },
         {
-            "name": "Búsquedas Artículos",
-            "description": "Operaciones de búsqueda y metadatos de artículos"
+            "name": "Sucursales",
+            "description": "Consultas auxiliares para sucursales"
         },
         {
-            "name": "Catálogo de Proveedores",
-            "description": "Operaciones CRUD para el catálogo de proveedores"
+            "name": "Gestión de Claves",
+            "description": "Endpoints para asignar y cambiar claves de usuario (migrado desde FormSistemaCambiarClave)"
         },
         {
-            "name": "Búsquedas Vendedores",
-            "description": "Operaciones de búsqueda de vendedores."
-        },
-        {
-            "name": "Búsquedas Proveedores",
-            "description": "Operaciones de búsqueda de proveedores."
-        },
-        {
-            "name": "Catálogos",
-            "description": "Recursos de catálogos estáticos y auxiliares"
+            "name": "Bitácora de Usuarios",
+            "description": "Consulta migrada de ServidorAdminSistema::ConsultaBitacoraUnificada"
         }
     ],
     "paths": {
-        "/api/v1/ejemplo/busqueda/articulos": {
-            "post": {
+        "/api/v1/usuarios/{id}/clave": {
+            "put": {
                 "tags": [
-                    "Búsquedas Artículos"
+                    "Gestión de Claves"
                 ],
-                "summary": "Buscar artículos",
-                "description": "Permite buscar artículos por distintos criterios (tipo, sucursal, dato ingresado).",
-                "operationId": "buscarArticulos",
+                "summary": "Cambiar clave existente",
+                "description": "Cambia la clave de un usuario que ya tiene password. Equivalente a ServidorAdminSistema::CambiaClave del sistema legado. Ambas claves (actual y nueva) deben enviarse ya cifradas en SHA-256 (64 caracteres hexadecimales).",
+                "operationId": "cambiarClave",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del usuario (empleado)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "CRCP"
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/BusquedaArticulosRequest"
+                                "$ref": "#/components/schemas/CambiarClaveRequest"
                             }
                         }
                     },
@@ -84,31 +82,135 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Búsqueda exitosa / resultados (success=true)",
+                        "description": "Clave cambiada correctamente",
                         "content": {
-                            "*/*": {
+                            "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/BusquedaArticulosResponse"
+                                    "$ref": "#/components/schemas/ClaveResponse"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "usuario": "CRCP",
+                                    "message": "Clave cambiada correctamente"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Validación fallida (sucursal faltante u otros)",
+                        "description": "Petición inválida (validación de formato hash)",
                         "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BusquedaArticulosResponse"
+                            "application/json": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Clave actual incorrecta",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": false,
+                                    "usuario": null,
+                                    "message": "La clave actual no es correcta"
                                 }
                             }
                         }
                     },
-                    "500": {
-                        "description": "Error interno del servidor",
+                    "404": {
+                        "description": "Usuario no encontrado",
                         "content": {
-                            "*/*": {
+                            "application/json": {
+                                "example": {
+                                    "success": false,
+                                    "usuario": null,
+                                    "message": "Usuario no encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflicto: la nueva clave es igual a la actual",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": false,
+                                    "usuario": null,
+                                    "message": "La nueva clave no puede ser igual a la clave actual"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Gestión de Claves"
+                ],
+                "summary": "Asignar clave inicial",
+                "description": "Asigna una clave inicial a un usuario que no tiene password (password IS NULL). Equivalente a ServidorAdminSistema::AsignaPassword del sistema legado. La clave debe enviarse ya cifrada en SHA-256 (64 caracteres hexadecimales).",
+                "operationId": "asignarClave",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identificador del usuario (empleado)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "CRCP"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AsignarClaveRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Clave asignada correctamente",
+                        "content": {
+                            "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/BusquedaArticulosResponse"
+                                    "$ref": "#/components/schemas/ClaveResponse"
+                                },
+                                "example": {
+                                    "success": true,
+                                    "usuario": "CRCP",
+                                    "message": "Clave asignada correctamente"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Petición inválida (validación de formato hash)",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": false,
+                                    "usuario": null,
+                                    "message": "Usuario no encontrado"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflicto: el usuario ya tiene clave asignada",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": false,
+                                    "usuario": null,
+                                    "message": "El usuario ya tiene una clave asignada. Use el endpoint de cambio de clave."
                                 }
                             }
                         }
@@ -116,43 +218,226 @@
                 }
             }
         },
-        "/api/v1/catalogos/clientes": {
+        "/api/v1/usuarios/{empleado}": {
             "get": {
                 "tags": [
-                    "Catálogo Clientes"
+                    "Catálogo de Usuarios"
                 ],
-                "summary": "Listar clientes",
-                "description": "Listar clientes con paginación y filtros",
-                "operationId": "listarClientes",
+                "summary": "Obtener usuario",
+                "description": "Consulta detallada de un usuario",
+                "operationId": "obtener",
                 "parameters": [
                     {
-                        "name": "filtros",
+                        "name": "empleado",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Catálogo de Usuarios"
+                ],
+                "summary": "Actualizar usuario",
+                "description": "Modificación equivalente a GrabaUsuarios (M)",
+                "operationId": "actualizar",
+                "parameters": [
+                    {
+                        "name": "empleado",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UsuarioRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario actualizado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Petición inválida",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Catálogo de Usuarios"
+                ],
+                "summary": "Eliminar usuario",
+                "description": "Equivalente a BajaUsuario",
+                "operationId": "eliminar",
+                "parameters": [
+                    {
+                        "name": "empleado",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario eliminado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Restricción de referencia",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/usuarios": {
+            "get": {
+                "tags": [
+                    "Catálogo de Usuarios"
+                ],
+                "summary": "Listar usuarios",
+                "description": "Equivalente a ConsultaUsuario (grid principal)",
+                "operationId": "listar",
+                "parameters": [
+                    {
+                        "name": "soloActivos",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    },
+                    {
+                        "name": "filtro",
                         "in": "query",
                         "required": false,
                         "schema": {
                             "type": "string"
                         }
-                    },
-                    {
-                        "name": "pagina",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int32",
-                            "default": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Consulta ejecutada",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioListResponse"
+                                }
+                            }
                         }
                     },
-                    {
-                        "name": "registrosPorPagina",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int32",
-                            "default": 20
+                    "400": {
+                        "description": "Parámetros inválidos",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioListResponse"
+                                }
+                            }
                         }
                     },
+                    "500": {
+                        "description": "Error interno",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioListResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Catálogo de Usuarios"
+                ],
+                "summary": "Crear usuario",
+                "description": "Alta de usuario equivalente a GrabaUsuarios (A)",
+                "operationId": "crear",
+                "parameters": [
                     {
                         "name": "X-Sucursal",
                         "in": "header",
@@ -163,64 +448,33 @@
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClienteListResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Catálogo Clientes"
-                ],
-                "summary": "Crear/Actualizar cliente",
-                "description": "Alta o modificación de cliente (ID_GRA_CLIENTE)",
-                "operationId": "grabarCliente",
-                "parameters": [
-                    {
-                        "name": "X-Sucursal",
-                        "in": "header",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "S1"
-                        }
-                    }
-                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ClienteRequest"
+                                "$ref": "#/components/schemas/UsuarioRequest"
                             }
                         }
                     },
                     "required": true
                 },
                 "responses": {
-                    "200": {
-                        "description": "Operación exitosa",
+                    "201": {
+                        "description": "Usuario creado",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
+                                    "$ref": "#/components/schemas/UsuarioResponse"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Validación o datos incorrectos",
+                        "description": "Petición inválida",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
+                                    "$ref": "#/components/schemas/UsuarioResponse"
                                 }
                             }
                         }
@@ -230,7 +484,7 @@
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
+                                    "$ref": "#/components/schemas/UsuarioResponse"
                                 }
                             }
                         }
@@ -238,131 +492,32 @@
                 }
             }
         },
-        "/api/v1/catalogos/clientes/{idCliente}/ecommerce": {
-            "get": {
-                "tags": [
-                    "Catálogo Clientes"
-                ],
-                "summary": "Obtener datos ecommerce",
-                "description": "Consulta detalles de ecommerce del cliente",
-                "operationId": "obtenerDetalleEcommerce",
-                "parameters": [
-                    {
-                        "name": "idCliente",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClienteDetalleEcommerceDTO"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
+        "/api/v1/security/privilegios/cache/flush": {
             "post": {
                 "tags": [
-                    "Catálogo Clientes"
+                    "authorization-controller"
                 ],
-                "summary": "Guardar datos ecommerce",
-                "description": "Crea o actualiza detalles de ecommerce",
-                "operationId": "guardarDetalleEcommerce",
-                "parameters": [
-                    {
-                        "name": "idCliente",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ClienteDetalleEcommerceDTO"
-                            }
-                        }
-                    },
-                    "required": true
-                },
+                "operationId": "flushCache",
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClienteDetalleEcommerceDTO"
-                                }
-                            }
-                        }
+                        "description": "OK"
                     }
                 }
             }
         },
-        "/api/v1/catalogos/clientes/{idCliente}/credito": {
-            "get": {
-                "tags": [
-                    "Catálogo Clientes"
-                ],
-                "summary": "Obtener datos crédito",
-                "description": "Consulta datos de crédito de un cliente",
-                "operationId": "obtenerDatosCredito",
-                "parameters": [
-                    {
-                        "name": "idCliente",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DatosCreditoDTO"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
+        "/api/v1/bitacora-unificada": {
             "post": {
                 "tags": [
-                    "Catálogo Clientes"
+                    "Bitácora de Usuarios"
                 ],
-                "summary": "Guardar datos crédito",
-                "description": "Crea o actualiza datos de crédito del cliente",
-                "operationId": "guardarDatosCredito",
-                "parameters": [
-                    {
-                        "name": "idCliente",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
+                "summary": "Consultar bitácora unificada",
+                "description": "Ejecuta la consulta legacy ConsultaBitacoraUnificada para un rango de fechas, un usuario y opcionalmente una sucursal",
+                "operationId": "consultar",
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DatosCreditoDTO"
+                                "$ref": "#/components/schemas/BitacoraUnificadaRequest"
                             }
                         }
                     },
@@ -370,53 +525,21 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Consulta ejecutada",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/DatosCreditoDTO"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/busqueda/vendedores": {
-            "post": {
-                "tags": [
-                    "Búsquedas Vendedores"
-                ],
-                "summary": "Buscar vendedores",
-                "description": "Búsqueda de vendedores por diferentes criterios:\n- NOM: Nombre del vendedor (búsqueda por prefijo)\n- APE: Apellidos paterno o materno (búsqueda por prefijo)\n- COMI: Tipo de comisión (búsqueda exacta)\n- CLA: Clave de empleado (búsqueda por prefijo)\n\nRetorna empleado, nombre completo, localidad y tipo de comisión.\nFiltro opcional por estado activo/inactivo.\n",
-                "operationId": "buscarVendedores",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/BusquedaVendedoresRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Búsqueda exitosa",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BusquedaVendedoresResponse"
+                                    "$ref": "#/components/schemas/BitacoraUnificadaResponse"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Solicitud inválida",
+                        "description": "Parámetros inválidos",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/BusquedaVendedoresResponse"
+                                    "$ref": "#/components/schemas/BitacoraUnificadaResponse"
                                 }
                             }
                         }
@@ -426,111 +549,7 @@
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/BusquedaVendedoresResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/busqueda/proveedores": {
-            "post": {
-                "tags": [
-                    "Búsquedas Proveedores"
-                ],
-                "summary": "Buscar proveedores",
-                "description": "Búsqueda por códigos RSO, RFC, CLA o REP según request.",
-                "operationId": "buscarProveedores",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/BusquedaProveedoresRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Búsqueda exitosa",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BusquedaProveedoresResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Solicitud inválida",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BusquedaProveedoresResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BusquedaProveedoresResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/busqueda/clientes": {
-            "post": {
-                "tags": [
-                    "Búsquedas Clientes"
-                ],
-                "summary": "Buscar clientes",
-                "description": "Realiza búsqueda de clientes según tipo/condición enviada en el request.",
-                "operationId": "buscarClientes",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/BusquedaClientesRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Búsqueda exitosa",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BusquedaClientesResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Solicitud inválida / validación",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BusquedaClientesResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BusquedaClientesResponse"
+                                    "$ref": "#/components/schemas/BitacoraUnificadaResponse"
                                 }
                             }
                         }
@@ -642,173 +661,24 @@
                 }
             }
         },
-        "/api/catalogo/proveedores": {
+        "/api/v1/usuarios/empleados-disponibles": {
             "get": {
                 "tags": [
-                    "Catálogo de Proveedores"
+                    "Catálogo de Usuarios"
                 ],
-                "summary": "Consultar proveedores",
-                "description": "Obtiene todos los proveedores activos con paginación",
-                "operationId": "consultarProveedores",
-                "parameters": [
-                    {
-                        "name": "pageable",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/Pageable"
-                        }
-                    }
-                ],
+                "summary": "Listar empleados disponibles",
+                "description": "Tercer result set legacy para llenar combos",
+                "operationId": "empleadosDisponibles",
                 "responses": {
                     "200": {
-                        "description": "Proveedores encontrados",
+                        "description": "Consulta ejecutada",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Page"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PageProveedorResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Catálogo de Proveedores"
-                ],
-                "summary": "Grabar proveedor",
-                "description": "Crea un nuevo proveedor o modifica uno existente según la operación especificada",
-                "operationId": "grabarProveedor",
-                "parameters": [
-                    {
-                        "name": "X-Usuario",
-                        "in": "header",
-                        "description": "Usuario que realiza la operación",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ProveedorRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Proveedor grabado exitosamente",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProveedorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "201": {
-                        "description": "Proveedor creado exitosamente",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProveedorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Datos de entrada inválidos",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProveedorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "409": {
-                        "description": "Conflicto - RFC o CURP duplicados",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProveedorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProveedorResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/catalogos/clientes/{codigoCliente}": {
-            "get": {
-                "tags": [
-                    "Catálogo Clientes"
-                ],
-                "summary": "Consultar cliente",
-                "description": "Obtiene datos de un cliente existente",
-                "operationId": "consultarCliente",
-                "parameters": [
-                    {
-                        "name": "codigoCliente",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "X-Sucursal",
-                        "in": "header",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "S1"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Cliente encontrado",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "No existe",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EmpleadoOptionResponse"
+                                    }
                                 }
                             }
                         }
@@ -818,145 +688,9 @@
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Catálogo Clientes"
-                ],
-                "summary": "Eliminar cliente",
-                "description": "Elimina un cliente por código (ID_BAJ_CLIENTE)",
-                "operationId": "eliminarCliente",
-                "parameters": [
-                    {
-                        "name": "codigoCliente",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/BajaClienteRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Cliente eliminado",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Petición inválida",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Cliente no encontrado",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClienteResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "head": {
-                "tags": [
-                    "Catálogo Clientes"
-                ],
-                "summary": "Verificar existencia cliente",
-                "description": "HEAD para validar existencia de un cliente",
-                "operationId": "verificarExistenciaCliente",
-                "parameters": [
-                    {
-                        "name": "codigoCliente",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/api/v1/ejemplo/busqueda/ping": {
-            "get": {
-                "tags": [
-                    "Búsquedas Artículos"
-                ],
-                "summary": "Ping del servicio de búsqueda de artículos",
-                "description": "Endpoint simple para monitoreo / health check.",
-                "operationId": "ping",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/ejemplo/busqueda/configuracion/sucursal": {
-            "get": {
-                "tags": [
-                    "Búsquedas Artículos"
-                ],
-                "summary": "Sucursal activa por defecto",
-                "description": "Devuelve la sucursal configurada por defecto en el sistema.",
-                "operationId": "obtenerSucursalActiva",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                        "type": "string"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EmpleadoOptionResponse"
                                     }
                                 }
                             }
@@ -965,23 +699,15 @@
                 }
             }
         },
-        "/api/v1/ejemplo/busqueda/articulos/{articulo}/detalles": {
+        "/api/v1/usuarios/combo-box": {
             "get": {
                 "tags": [
-                    "Búsquedas Artículos"
+                    "Catálogo de Usuarios"
                 ],
-                "summary": "Detalles de un artículo",
-                "description": "Obtiene información detallada de un artículo para una sucursal específica (o la por defecto).",
-                "operationId": "obtenerDetallesArticulo",
+                "summary": "ComboBox de usuarios",
+                "description": "Lista usuarios para llenar combos generales, con filtro opcional por sucursal.",
+                "operationId": "comboUsuarios",
                 "parameters": [
-                    {
-                        "name": "articulo",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "sucursal",
                         "in": "query",
@@ -993,59 +719,26 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/ejemplo/busqueda/articulos/tipos": {
-            "get": {
-                "tags": [
-                    "Búsquedas Artículos"
-                ],
-                "summary": "Tipos de búsqueda disponibles",
-                "description": "Lista códigos de tipos de búsqueda soportados.",
-                "operationId": "obtenerTiposBusqueda",
-                "responses": {
-                    "200": {
-                        "description": "OK",
+                        "description": "Consulta ejecutada",
                         "content": {
                             "*/*": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "string"
+                                        "$ref": "#/components/schemas/UsuarioComboOptionResponse"
                                     }
                                 }
                             }
                         }
-                    }
-                }
-            }
-        },
-        "/api/v1/catalogos/usos-cfdi": {
-            "get": {
-                "tags": [
-                    "Catálogos"
-                ],
-                "summary": "Usos CFDI",
-                "description": "Obtiene catálogo de usos CFDI.",
-                "operationId": "obtenerUsosCfdi",
-                "responses": {
-                    "200": {
-                        "description": "OK",
+                    },
+                    "500": {
+                        "description": "Error interno",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UsuarioComboOptionResponse"
                                     }
                                 }
                             }
@@ -1054,43 +747,19 @@
                 }
             }
         },
-        "/api/v1/catalogos/tipos-precios": {
+        "/api/v1/sucursales/combo-box": {
             "get": {
                 "tags": [
-                    "Catálogos"
+                    "Sucursales"
                 ],
-                "summary": "Tipos de precios",
-                "description": "Obtiene lista general de tipos de precios.",
-                "operationId": "obtenerTiposPrecios",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/catalogos/tipos-precios/empresa/{idEmpresa}": {
-            "get": {
-                "tags": [
-                    "Catálogos"
-                ],
-                "summary": "Tipos de precios por empresa",
-                "description": "Obtiene tipos de precios asociados a una empresa.",
-                "operationId": "obtenerTiposPreciosPorEmpresa",
+                "summary": "ComboBox de sucursales",
+                "description": "Lista sucursales para combos, con filtro opcional por empresa.",
+                "operationId": "comboSucursales",
                 "parameters": [
                     {
                         "name": "idEmpresa",
-                        "in": "path",
-                        "required": true,
+                        "in": "query",
+                        "required": false,
                         "schema": {
                             "type": "integer",
                             "format": "int32"
@@ -1099,12 +768,26 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Consulta ejecutada",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SucursalComboOptionResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SucursalComboOptionResponse"
                                     }
                                 }
                             }
@@ -1113,22 +796,21 @@
                 }
             }
         },
-        "/api/v1/catalogos/tipos-cuentas-bancarias": {
+        "/api/v1/security/privilegios": {
             "get": {
                 "tags": [
-                    "Catálogos"
+                    "authorization-controller"
                 ],
-                "summary": "Tipos de cuentas bancarias",
-                "description": "Obtiene catálogo de tipos de cuentas bancarias activas.",
-                "operationId": "obtenerTiposCuentasBancarias",
+                "operationId": "listar_1",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ObjetoPrivilegiosDTO"
                                     }
                                 }
                             }
@@ -1137,114 +819,16 @@
                 }
             }
         },
-        "/api/v1/catalogos/sociedades-mercantiles": {
+        "/api/v1/security/privilegios/{objeto}": {
             "get": {
                 "tags": [
-                    "Catálogos"
+                    "authorization-controller"
                 ],
-                "summary": "Sociedades mercantiles",
-                "description": "Obtiene catálogo de sociedades mercantiles.",
-                "operationId": "obtenerSociedadesMercantiles",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/catalogos/regimenes-fiscales": {
-            "get": {
-                "tags": [
-                    "Catálogos"
-                ],
-                "summary": "Regímenes fiscales",
-                "description": "Obtiene catálogo de regímenes fiscales.",
-                "operationId": "obtenerRegimenesFiscales",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/catalogos/giros": {
-            "get": {
-                "tags": [
-                    "Catálogos"
-                ],
-                "summary": "Giros de negocio",
-                "description": "Obtiene giros de negocio válidos.",
-                "operationId": "obtenerGirosNegocio",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/catalogos/colonias": {
-            "get": {
-                "tags": [
-                    "Catálogos"
-                ],
-                "summary": "Listar colonias",
-                "description": "Obtiene todas las colonias.",
-                "operationId": "obtenerColonias",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/catalogos/colonias/buscar": {
-            "get": {
-                "tags": [
-                    "Catálogos"
-                ],
-                "summary": "Buscar colonias",
-                "description": "Filtra colonias por nombre (contiene).",
-                "operationId": "buscarColonias",
+                "operationId": "listarPorObjeto",
                 "parameters": [
                     {
-                        "name": "nombre",
-                        "in": "query",
+                        "name": "objeto",
+                        "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -1257,8 +841,9 @@
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PrivilegioDTO"
                                     }
                                 }
                             }
@@ -1267,21 +852,37 @@
                 }
             }
         },
-        "/api/v1/catalogos/clientes/status": {
+        "/api/v1/security/privilegios/{objeto}/{privilegio}": {
             "get": {
                 "tags": [
-                    "Catálogo Clientes"
+                    "authorization-controller"
                 ],
-                "summary": "Estado servicio clientes",
-                "description": "Health endpoint del módulo",
-                "operationId": "status",
+                "operationId": "revisar",
+                "parameters": [
+                    {
+                        "name": "objeto",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "privilegio",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "string"
+                                    "$ref": "#/components/schemas/PrivilegeCheckResponse"
                                 }
                             }
                         }
@@ -1289,23 +890,19 @@
                 }
             }
         },
-        "/api/v1/catalogos/canales": {
+        "/api/v1/security/privilegios/version/requerimientos": {
             "get": {
                 "tags": [
-                    "Catálogos"
+                    "authorization-controller"
                 ],
-                "summary": "Canales de clientes",
-                "description": "Obtiene catálogo de canales.",
-                "operationId": "obtenerCanalesClientes",
+                "operationId": "version",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                    }
+                                    "$ref": "#/components/schemas/VersionRequirementDTO"
                                 }
                             }
                         }
@@ -1313,22 +910,21 @@
                 }
             }
         },
-        "/api/v1/catalogos/bancos": {
+        "/api/v1/security/privilegios/self": {
             "get": {
                 "tags": [
-                    "Catálogos"
+                    "authorization-controller"
                 ],
-                "summary": "Bancos",
-                "description": "Obtiene catálogo de bancos activos.",
-                "operationId": "obtenerBancos",
+                "operationId": "listarSelf",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "object",
-                                    "additionalProperties": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ObjetoPrivilegiosDTO"
                                     }
                                 }
                             }
@@ -1376,7 +972,7 @@
                 ],
                 "summary": "Estado del servicio de autenticación",
                 "description": "Devuelve mensaje simple para monitoreo / health check.",
-                "operationId": "status_1",
+                "operationId": "status",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1391,268 +987,38 @@
                 }
             }
         },
-        "/api/catalogo/proveedores/{proveedor}": {
-            "get": {
-                "tags": [
-                    "Catálogo de Proveedores"
-                ],
-                "summary": "Consultar proveedor por clave",
-                "description": "Obtiene un proveedor específico por su clave",
-                "operationId": "consultarProveedor",
-                "parameters": [
-                    {
-                        "name": "proveedor",
-                        "in": "path",
-                        "description": "Clave del proveedor",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Proveedor encontrado",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProveedorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Proveedor no encontrado",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProveedorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProveedorResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
+        "/api/v1/security/privilegios/cache/{usuario}": {
             "delete": {
                 "tags": [
-                    "Catálogo de Proveedores"
+                    "authorization-controller"
                 ],
-                "summary": "Dar de baja proveedor",
-                "description": "Realiza la baja lógica de un proveedor (lo marca como inactivo)",
-                "operationId": "bajaProveedor",
+                "operationId": "flushCacheUsuario",
                 "parameters": [
                     {
-                        "name": "proveedor",
+                        "name": "usuario",
                         "in": "path",
-                        "description": "Clave del proveedor a dar de baja",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    {
-                        "name": "X-Usuario",
-                        "in": "header",
-                        "description": "Usuario que realiza la operación",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "default": "SISTEMA"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Proveedor dado de baja exitosamente"
-                    },
-                    "404": {
-                        "description": "Proveedor no encontrado"
-                    },
-                    "409": {
-                        "description": "Conflicto - El proveedor no se puede dar de baja"
-                    },
-                    "500": {
-                        "description": "Error interno del servidor"
+                        "description": "OK"
                     }
                 }
             }
         },
-        "/api/catalogo/proveedores/ping": {
-            "get": {
+        "/api/v1/security/privilegios/cache/self": {
+            "delete": {
                 "tags": [
-                    "Catálogo de Proveedores"
+                    "authorization-controller"
                 ],
-                "summary": "Ping",
-                "description": "Endpoint para verificar que el servicio está disponible",
-                "operationId": "ping_1",
+                "operationId": "flushCachePropio",
                 "responses": {
                     "200": {
-                        "description": "Servicio disponible",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/catalogo/proveedores/buscar/razon-social": {
-            "get": {
-                "tags": [
-                    "Catálogo de Proveedores"
-                ],
-                "summary": "Buscar proveedores por razón social",
-                "description": "Busca proveedores que contengan el texto especificado en la razón social",
-                "operationId": "buscarPorRazonSocial",
-                "parameters": [
-                    {
-                        "name": "razonSocial",
-                        "in": "query",
-                        "description": "Texto a buscar en la razón social",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "pageable",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/Pageable"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Búsqueda realizada exitosamente",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Page"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Parámetros de búsqueda inválidos",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PageProveedorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PageProveedorResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/catalogo/proveedores/buscar/avanzada": {
-            "get": {
-                "tags": [
-                    "Catálogo de Proveedores"
-                ],
-                "summary": "Búsqueda avanzada de proveedores",
-                "description": "Busca proveedores por múltiples criterios: razón social, RFC, estado, comprador, tipo",
-                "operationId": "busquedaAvanzada",
-                "parameters": [
-                    {
-                        "name": "razonSocial",
-                        "in": "query",
-                        "description": "Texto a buscar en la razón social",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "rfc",
-                        "in": "query",
-                        "description": "RFC del proveedor",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "estado",
-                        "in": "query",
-                        "description": "Estado del proveedor",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "comprador",
-                        "in": "query",
-                        "description": "Comprador asignado",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "tipoProveedor",
-                        "in": "query",
-                        "description": "Tipo de proveedor: GASTOS, MERCANCIA",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "pageable",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/Pageable"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Búsqueda realizada exitosamente",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Page"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PageProveedorResponse"
-                                }
-                            }
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -1660,1176 +1026,134 @@
     },
     "components": {
         "schemas": {
-            "BusquedaArticulosRequest": {
+            "CambiarClaveRequest": {
                 "type": "object",
+                "description": "Petición para cambiar la clave de un usuario existente",
                 "properties": {
-                    "sucursal": {
-                        "type": "string"
+                    "claveActual": {
+                        "type": "string",
+                        "description": "Hash SHA-256 de la clave actual (64 caracteres hex)",
+                        "example": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "pattern": "^[a-fA-F0-9]{64}$"
                     },
-                    "mostrarExistencias": {
-                        "type": "string"
-                    },
-                    "mostrarInactivos": {
-                        "type": "string"
-                    },
-                    "codcondicion": {
-                        "type": "string"
-                    },
-                    "filas": {
-                        "type": "string"
-                    },
-                    "condicion": {
-                        "type": "string"
-                    },
-                    "tipoBusqueda": {
-                        "type": "string"
-                    },
-                    "datoBuscado": {
-                        "type": "string"
-                    },
-                    "soloActivos": {
-                        "type": "string"
+                    "nuevaClave": {
+                        "type": "string",
+                        "description": "Hash SHA-256 de la nueva clave (64 caracteres hex)",
+                        "example": "3c5636d872b042199e6a04a0e1e77aa15641244b7c5a826c71da5dce9d765a61",
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "pattern": "^[a-fA-F0-9]{64}$"
                     }
-                }
+                },
+                "required": [
+                    "claveActual",
+                    "nuevaClave"
+                ]
             },
-            "ArticuloResultado": {
+            "ClaveResponse": {
                 "type": "object",
-                "properties": {
-                    "nombre": {
-                        "type": "string"
-                    },
-                    "present": {
-                        "type": "string"
-                    },
-                    "multiplo": {
-                        "type": "string"
-                    },
-                    "factor": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "marca": {
-                        "type": "string"
-                    },
-                    "nomMarca": {
-                        "type": "string"
-                    },
-                    "producto": {
-                        "type": "string"
-                    },
-                    "articulo": {
-                        "type": "string"
-                    },
-                    "ean13": {
-                        "type": "string"
-                    },
-                    "activo": {
-                        "type": "integer",
-                        "format": "int32"
-                    }
-                }
-            },
-            "BusquedaArticulosResponse": {
-                "type": "object",
+                "description": "Respuesta de operación de clave de usuario",
                 "properties": {
                     "success": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "description": "Indica si la operación fue exitosa"
+                    },
+                    "usuario": {
+                        "type": "string",
+                        "description": "Identificador del usuario afectado",
+                        "example": "CRCP"
                     },
                     "message": {
-                        "type": "string"
-                    },
-                    "articulos": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ArticuloResultado"
-                        }
-                    },
-                    "clasificaciones": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ClasificacionResultado"
-                        }
-                    },
-                    "marcas": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/MarcaResultado"
-                        }
-                    },
-                    "totalResultados": {
-                        "type": "integer",
-                        "format": "int32"
+                        "type": "string",
+                        "description": "Mensaje descriptivo del resultado"
                     }
                 }
             },
-            "ClasificacionResultado": {
+            "UsuarioRequest": {
                 "type": "object",
+                "description": "Datos requeridos para crear o actualizar un usuario legado",
                 "properties": {
-                    "clasif1": {
-                        "type": "string"
-                    },
-                    "nombre": {
-                        "type": "string"
-                    }
-                }
-            },
-            "MarcaResultado": {
-                "type": "object",
-                "properties": {
-                    "marca": {
-                        "type": "string"
-                    },
-                    "nombre": {
-                        "type": "string"
-                    }
-                }
-            },
-            "ClienteRequest": {
-                "type": "object",
-                "properties": {
-                    "operacion": {
+                    "empleado": {
                         "type": "string",
-                        "minLength": 1,
-                        "pattern": "^[AM]$"
+                        "description": "Clave del empleado al que se asociará el usuario",
+                        "example": "CRCP",
+                        "minLength": 1
                     },
-                    "cliente": {
-                        "type": "string"
-                    },
-                    "idEmpresa": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "nombre": {
+                    "password": {
                         "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "appat": {
-                        "type": "string",
-                        "maxLength": 40,
-                        "minLength": 0
-                    },
-                    "apmat": {
-                        "type": "string",
-                        "maxLength": 40,
-                        "minLength": 0
-                    },
-                    "titulo": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "fnaccli": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "tipoempre": {
-                        "type": "string",
-                        "pattern": "^[01FM]$"
-                    },
-                    "rsocial": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "minLength": 0
-                    },
-                    "nomnegocio": {
-                        "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "rfc": {
-                        "type": "string",
-                        "maxLength": 15,
-                        "minLength": 0
-                    },
-                    "curp": {
-                        "type": "string",
-                        "maxLength": 18,
-                        "minLength": 0
+                        "description": "Contraseña del sistema legado (se almacena tal cual en la tabla usuarios)"
                     },
                     "activo": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "description": "Indica si el usuario está activo",
+                        "example": true
                     },
-                    "sgerencia": {
-                        "type": "boolean"
-                    },
-                    "esparterelac": {
-                        "type": "boolean"
-                    },
-                    "venxvol": {
-                        "type": "boolean"
-                    },
-                    "esAsociado": {
-                        "type": "boolean"
-                    },
-                    "giro": {
-                        "type": "string"
-                    },
-                    "canal": {
-                        "type": "string"
-                    },
-                    "regimenfiscal": {
-                        "type": "string"
-                    },
-                    "sociedadmercantil": {
-                        "type": "string"
-                    },
-                    "calle": {
+                    "fechaAlta": {
                         "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
+                        "format": "date",
+                        "description": "Fecha de alta en formato ISO (se usa la fecha actual si no se envía)",
+                        "example": "2024-01-15"
                     },
-                    "numext": {
+                    "fechaBaja": {
                         "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
+                        "format": "date",
+                        "description": "Fecha de baja en formato ISO (por defecto 2099-01-01)",
+                        "example": "2099-01-01"
                     },
-                    "numint": {
+                    "usuarioContpaq": {
                         "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
+                        "description": "Usuario asociado al sistema Contpaq",
+                        "example": "CRCP_CONT"
                     },
-                    "referenciadomic": {
+                    "passwordContpaq": {
                         "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "cp": {
-                        "type": "string",
-                        "maxLength": 5,
-                        "minLength": 0
-                    },
-                    "colonia": {
-                        "type": "string"
-                    },
-                    "latitud": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "longitud": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "contacto": {
-                        "type": "string",
-                        "maxLength": 40,
-                        "minLength": 0
-                    },
-                    "contacfnac": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email",
-                        "maxLength": 50,
-                        "minLength": 0
-                    },
-                    "email2": {
-                        "type": "string",
-                        "format": "email",
-                        "maxLength": 50,
-                        "minLength": 0
-                    },
-                    "medio": {
-                        "type": "string"
-                    },
-                    "credito": {
-                        "type": "boolean"
-                    },
-                    "limcred": {
-                        "type": "number",
-                        "minimum": 0
-                    },
-                    "plazo": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    },
-                    "excederlc": {
-                        "type": "boolean"
-                    },
-                    "bloqueo": {
-                        "type": "string"
-                    },
-                    "imprsaldos": {
-                        "type": "boolean"
-                    },
-                    "numpedidos": {
-                        "type": "string"
-                    },
-                    "enviarcfd": {
-                        "type": "boolean"
-                    },
-                    "metododef": {
-                        "type": "string",
-                        "maxLength": 2,
-                        "minLength": 0
-                    },
-                    "metodosup": {
-                        "type": "string",
-                        "maxLength": 2,
-                        "minLength": 0
-                    },
-                    "digitosdef": {
-                        "type": "string",
-                        "maxLength": 4,
-                        "minLength": 0
-                    },
-                    "digitossup": {
-                        "type": "string",
-                        "maxLength": 4,
-                        "minLength": 0
-                    },
-                    "usocfdi": {
-                        "type": "string",
-                        "maxLength": 4,
-                        "minLength": 0
-                    },
-                    "valorsup": {
-                        "type": "number"
-                    },
-                    "agruparncre": {
-                        "type": "boolean"
-                    },
-                    "forzarimprimirvertical": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "credMax": {
-                        "type": "number"
-                    },
-                    "sucremotarelacion": {
-                        "type": "string"
-                    },
-                    "usuremotorelacion": {
-                        "type": "string"
-                    },
-                    "vendedor": {
-                        "type": "string"
-                    },
-                    "cobrador": {
-                        "type": "string"
-                    },
-                    "tipoprec": {
-                        "type": "string"
-                    },
-                    "tipoprecmin": {
-                        "type": "string"
-                    },
-                    "telefonos": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TelefonoRequest"
-                        }
-                    },
-                    "direccionesEntrega": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/DireccionEntregaRequest"
-                        }
-                    },
-                    "datosEmpresas": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/DatosEmpresaRequest"
-                        }
-                    },
-                    "nombreORazonValido": {
-                        "type": "boolean"
+                        "description": "Contraseña para el sistema Contpaq"
                     }
                 },
                 "required": [
-                    "idEmpresa",
-                    "metododef",
-                    "metodosup",
-                    "operacion",
-                    "usocfdi"
+                    "empleado"
                 ]
             },
-            "DatosEmpresaRequest": {
-                "type": "object",
-                "properties": {
-                    "idempresa": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "nombreEmpresa": {
-                        "type": "string"
-                    },
-                    "vendedor": {
-                        "type": "string"
-                    },
-                    "cobrador": {
-                        "type": "string"
-                    },
-                    "tipoprec": {
-                        "type": "string"
-                    },
-                    "tipoprecmin": {
-                        "type": "string"
-                    },
-                    "actualizar": {
-                        "type": "boolean"
-                    }
-                },
-                "required": [
-                    "idempresa"
-                ]
-            },
-            "DireccionEntregaRequest": {
-                "type": "object",
-                "properties": {
-                    "iddireccion": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "dafault": {
-                        "type": "boolean"
-                    },
-                    "calle": {
-                        "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "numext": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "numint": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "referenciadomic": {
-                        "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "colonia": {
-                        "type": "string"
-                    },
-                    "cp": {
-                        "type": "string",
-                        "maxLength": 5,
-                        "minLength": 0
-                    },
-                    "latitud": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "longitud": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "operacion": {
-                        "type": "string"
-                    }
-                }
-            },
-            "TelefonoRequest": {
-                "type": "object",
-                "properties": {
-                    "tipo": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "lada": {
-                        "type": "string",
-                        "maxLength": 8,
-                        "minLength": 0
-                    },
-                    "telefono": {
-                        "type": "string",
-                        "maxLength": 15,
-                        "minLength": 0
-                    },
-                    "extencionTel": {
-                        "type": "string",
-                        "maxLength": 5,
-                        "minLength": 0
-                    },
-                    "operacion": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "telefono",
-                    "tipo"
-                ]
-            },
-            "ClienteCompleto": {
-                "type": "object",
-                "properties": {
-                    "cliente": {
-                        "type": "string"
-                    },
-                    "nombre": {
-                        "type": "string"
-                    },
-                    "appat": {
-                        "type": "string"
-                    },
-                    "apmat": {
-                        "type": "string"
-                    },
-                    "sucursal": {
-                        "type": "string"
-                    },
-                    "fnaccli": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "titulo": {
-                        "type": "string"
-                    },
-                    "rsocial": {
-                        "type": "string"
-                    },
-                    "nomnegocio": {
-                        "type": "string"
-                    },
-                    "contacto": {
-                        "type": "string"
-                    },
-                    "contacfnac": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "tipoempre": {
-                        "type": "string"
-                    },
-                    "rfc": {
-                        "type": "string"
-                    },
-                    "curp": {
-                        "type": "string"
-                    },
-                    "activo": {
-                        "type": "boolean"
-                    },
-                    "sgerencia": {
-                        "type": "boolean"
-                    },
-                    "esparterelac": {
-                        "type": "boolean"
-                    },
-                    "venxvol": {
-                        "type": "boolean"
-                    },
-                    "esAsociado": {
-                        "type": "boolean"
-                    },
-                    "giro": {
-                        "type": "string"
-                    },
-                    "giroNombre": {
-                        "type": "string"
-                    },
-                    "canal": {
-                        "type": "string"
-                    },
-                    "canalNombre": {
-                        "type": "string"
-                    },
-                    "regimenfiscal": {
-                        "type": "string"
-                    },
-                    "regimenfiscalNombre": {
-                        "type": "string"
-                    },
-                    "sociedadmercantil": {
-                        "type": "string"
-                    },
-                    "sociedadmercantilNombre": {
-                        "type": "string"
-                    },
-                    "calle": {
-                        "type": "string"
-                    },
-                    "numext": {
-                        "type": "string"
-                    },
-                    "numint": {
-                        "type": "string"
-                    },
-                    "referenciadomic": {
-                        "type": "string"
-                    },
-                    "colonia": {
-                        "type": "string"
-                    },
-                    "coloniaNombre": {
-                        "type": "string"
-                    },
-                    "cp": {
-                        "type": "string"
-                    },
-                    "latitud": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "longitud": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "email": {
-                        "type": "string"
-                    },
-                    "email2": {
-                        "type": "string"
-                    },
-                    "medio": {
-                        "type": "string"
-                    },
-                    "medioNombre": {
-                        "type": "string"
-                    },
-                    "credito": {
-                        "type": "boolean"
-                    },
-                    "limcred": {
-                        "type": "number"
-                    },
-                    "plazo": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "excederlc": {
-                        "type": "boolean"
-                    },
-                    "bloqueo": {
-                        "type": "string"
-                    },
-                    "bloqueoNombre": {
-                        "type": "string"
-                    },
-                    "imprsaldos": {
-                        "type": "boolean"
-                    },
-                    "numpedidos": {
-                        "type": "string"
-                    },
-                    "comentcr": {
-                        "type": "string"
-                    },
-                    "enviarcfd": {
-                        "type": "boolean"
-                    },
-                    "metododef": {
-                        "type": "string"
-                    },
-                    "metodosup": {
-                        "type": "string"
-                    },
-                    "digitosdef": {
-                        "type": "string"
-                    },
-                    "digitossup": {
-                        "type": "string"
-                    },
-                    "usocfdi": {
-                        "type": "string"
-                    },
-                    "valorsup": {
-                        "type": "number"
-                    },
-                    "credMax": {
-                        "type": "number"
-                    },
-                    "agruparncre": {
-                        "type": "boolean"
-                    },
-                    "forzarimprimirvertical": {
-                        "type": "string"
-                    },
-                    "sucremotarelacion": {
-                        "type": "string"
-                    },
-                    "usuremotorelacion": {
-                        "type": "string"
-                    },
-                    "fechaalta": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "fechamodi": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "fechabloq": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "fechauven": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "telefonos": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TelefonoCliente"
-                        }
-                    },
-                    "direccionesEntrega": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/DireccionEntrega"
-                        }
-                    },
-                    "datosEmpresas": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/DatosEmpresa"
-                        }
-                    },
-                    "empresasDisponibles": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/EmpresaDisponible"
-                        }
-                    }
-                }
-            },
-            "ClienteResponse": {
-                "type": "object",
-                "properties": {
-                    "success": {
-                        "type": "boolean"
-                    },
-                    "message": {
-                        "type": "string"
-                    },
-                    "cliente": {
-                        "$ref": "#/components/schemas/ClienteCompleto"
-                    }
-                }
-            },
-            "DatosEmpresa": {
-                "type": "object",
-                "properties": {
-                    "idempresa": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "nombreEmpresa": {
-                        "type": "string"
-                    },
-                    "claveEmpresa": {
-                        "type": "string"
-                    },
-                    "vendedor": {
-                        "type": "string"
-                    },
-                    "vendedorNombre": {
-                        "type": "string"
-                    },
-                    "cobrador": {
-                        "type": "string"
-                    },
-                    "cobradorNombre": {
-                        "type": "string"
-                    },
-                    "tipoprec": {
-                        "type": "string"
-                    },
-                    "tipoprecNombre": {
-                        "type": "string"
-                    },
-                    "tipoprecmin": {
-                        "type": "string"
-                    },
-                    "tipoprecminNombre": {
-                        "type": "string"
-                    }
-                }
-            },
-            "DireccionEntrega": {
-                "type": "object",
-                "properties": {
-                    "iddireccion": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "dafault": {
-                        "type": "boolean"
-                    },
-                    "calle": {
-                        "type": "string"
-                    },
-                    "numext": {
-                        "type": "string"
-                    },
-                    "numint": {
-                        "type": "string"
-                    },
-                    "referenciadomic": {
-                        "type": "string"
-                    },
-                    "colonia": {
-                        "type": "string"
-                    },
-                    "coloniaNombre": {
-                        "type": "string"
-                    },
-                    "cp": {
-                        "type": "string"
-                    },
-                    "latitud": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "longitud": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "fechaalta": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "fechamodi": {
-                        "type": "string",
-                        "format": "date"
-                    }
-                }
-            },
-            "EmpresaDisponible": {
-                "type": "object",
-                "properties": {
-                    "idempresa": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "clave": {
-                        "type": "string"
-                    },
-                    "nombre": {
-                        "type": "string"
-                    },
-                    "sucprincipal": {
-                        "type": "string"
-                    },
-                    "essuper": {
-                        "type": "boolean"
-                    },
-                    "tieneConfiguracion": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "TelefonoCliente": {
-                "type": "object",
-                "properties": {
-                    "tipo": {
-                        "type": "string"
-                    },
-                    "tipoNombre": {
-                        "type": "string"
-                    },
-                    "lada": {
-                        "type": "string"
-                    },
-                    "telefono": {
-                        "type": "string"
-                    },
-                    "extencionTel": {
-                        "type": "string"
-                    }
-                }
-            },
-            "ClienteDetalleEcommerceDTO": {
-                "type": "object",
-                "properties": {
-                    "idcliente": {
-                        "type": "string"
-                    },
-                    "marketing": {
-                        "type": "boolean"
-                    },
-                    "verificaciontel": {
-                        "type": "boolean"
-                    },
-                    "verificacionemail": {
-                        "type": "boolean"
-                    },
-                    "activo": {
-                        "type": "boolean"
-                    },
-                    "observaciones": {
-                        "type": "string"
-                    }
-                }
-            },
-            "DatosCreditoDTO": {
-                "type": "object",
-                "properties": {
-                    "idcliente": {
-                        "type": "string"
-                    },
-                    "fechasolicitud": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "montosol": {
-                        "type": "number"
-                    },
-                    "plazosol": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "ventasprom": {
-                        "type": "number"
-                    },
-                    "numautos": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "ingresos": {
-                        "type": "number"
-                    },
-                    "egresos": {
-                        "type": "number"
-                    },
-                    "patrimonio": {
-                        "type": "number"
-                    },
-                    "p1tipo": {
-                        "type": "string"
-                    },
-                    "p1valor": {
-                        "type": "number"
-                    },
-                    "p1dir": {
-                        "type": "string"
-                    },
-                    "p1vhipot": {
-                        "type": "number"
-                    },
-                    "p1acreedor": {
-                        "type": "string"
-                    },
-                    "p2tipo": {
-                        "type": "string"
-                    },
-                    "p2valor": {
-                        "type": "number"
-                    },
-                    "p2dir": {
-                        "type": "string"
-                    },
-                    "p2vhipot": {
-                        "type": "number"
-                    },
-                    "p2acreedor": {
-                        "type": "string"
-                    },
-                    "a1nombre": {
-                        "type": "string"
-                    },
-                    "a1tel": {
-                        "type": "string"
-                    },
-                    "a1dir": {
-                        "type": "string"
-                    },
-                    "a2nombre": {
-                        "type": "string"
-                    },
-                    "a2tel": {
-                        "type": "string"
-                    },
-                    "a2dir": {
-                        "type": "string"
-                    },
-                    "rf1nom": {
-                        "type": "string"
-                    },
-                    "rf1tel": {
-                        "type": "string"
-                    },
-                    "rf1parent": {
-                        "type": "string"
-                    },
-                    "rf1ocup": {
-                        "type": "string"
-                    },
-                    "rf2nom": {
-                        "type": "string"
-                    },
-                    "rf2tel": {
-                        "type": "string"
-                    },
-                    "rf2parent": {
-                        "type": "string"
-                    },
-                    "rf2ocup": {
-                        "type": "string"
-                    },
-                    "rb1banco": {
-                        "type": "string"
-                    },
-                    "rb1sucursal": {
-                        "type": "string"
-                    },
-                    "rb1cuenta": {
-                        "type": "string"
-                    },
-                    "rb1tel": {
-                        "type": "string"
-                    },
-                    "rb2banco": {
-                        "type": "string"
-                    },
-                    "rb2sucursal": {
-                        "type": "string"
-                    },
-                    "rb2cuenta": {
-                        "type": "string"
-                    },
-                    "rb2tel": {
-                        "type": "string"
-                    },
-                    "rc1empresa": {
-                        "type": "string"
-                    },
-                    "rc1contacto": {
-                        "type": "string"
-                    },
-                    "rc1tel": {
-                        "type": "string"
-                    },
-                    "rc1limite": {
-                        "type": "number"
-                    },
-                    "rc2empresa": {
-                        "type": "string"
-                    },
-                    "rc2contacto": {
-                        "type": "string"
-                    },
-                    "rc2tel": {
-                        "type": "string"
-                    },
-                    "rc2limite": {
-                        "type": "number"
-                    },
-                    "empresa": {
-                        "type": "string"
-                    },
-                    "puesto": {
-                        "type": "string"
-                    },
-                    "antiguedad": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "observaciones": {
-                        "type": "string"
-                    }
-                }
-            },
-            "BusquedaVendedoresRequest": {
-                "type": "object",
-                "properties": {
-                    "tipoBusqueda": {
-                        "type": "string",
-                        "minLength": 1,
-                        "pattern": "^(NOM|APE|COMI|CLA)$"
-                    },
-                    "soloActivos": {
-                        "type": "boolean"
-                    },
-                    "valor": {
-                        "type": "string",
-                        "maxLength": 50,
-                        "minLength": 0
-                    },
-                    "limite": {
-                        "type": "integer",
-                        "format": "int32"
-                    }
-                },
-                "required": [
-                    "tipoBusqueda",
-                    "valor"
-                ]
-            },
-            "BusquedaVendedoresResponse": {
-                "type": "object",
-                "properties": {
-                    "success": {
-                        "type": "boolean"
-                    },
-                    "message": {
-                        "type": "string"
-                    },
-                    "totalResultados": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "vendedores": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/VendedorResultado"
-                        }
-                    }
-                }
-            },
-            "VendedorResultado": {
+            "UsuarioDetail": {
                 "type": "object",
                 "properties": {
                     "empleado": {
                         "type": "string"
                     },
-                    "nombre": {
-                        "type": "string"
-                    },
-                    "localidad": {
-                        "type": "string"
-                    },
-                    "tipocomi": {
+                    "nombreCompleto": {
                         "type": "string"
                     },
                     "activo": {
                         "type": "boolean"
+                    },
+                    "fechaAlta": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "fechaBaja": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "ultimoAcceso": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "usuarioContpaq": {
+                        "type": "string"
+                    },
+                    "passwordContpaq": {
+                        "type": "string"
                     }
                 }
             },
-            "BusquedaProveedoresRequest": {
+            "UsuarioResponse": {
                 "type": "object",
-                "properties": {
-                    "codcondicion": {
-                        "type": "string",
-                        "minLength": 1,
-                        "pattern": "^(RSO|RFC|CLA|REP|)$"
-                    },
-                    "mostrarInactivos": {
-                        "type": "boolean"
-                    },
-                    "condicion": {
-                        "type": "string",
-                        "maxLength": 100,
-                        "minLength": 0
-                    },
-                    "soloProveedorGastos": {
-                        "type": "boolean"
-                    },
-                    "soloProveedorMercancia": {
-                        "type": "boolean"
-                    },
-                    "filas": {
-                        "type": "string",
-                        "pattern": "^[1-9][0-9]*$"
-                    }
-                },
-                "required": [
-                    "codcondicion"
-                ]
-            },
-            "BusquedaProveedoresResponse": {
-                "type": "object",
+                "description": "Respuesta estándar para operaciones de catálogo de usuarios",
                 "properties": {
                     "success": {
                         "type": "boolean"
@@ -2837,92 +1161,68 @@
                     "message": {
                         "type": "string"
                     },
-                    "totalResultados": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "proveedores": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ProveedorResultado"
-                        }
+                    "usuario": {
+                        "$ref": "#/components/schemas/UsuarioDetail"
                     }
                 }
             },
-            "ProveedorResultado": {
+            "AsignarClaveRequest": {
                 "type": "object",
+                "description": "Petición para asignar clave inicial a un usuario sin contraseña",
                 "properties": {
-                    "proveedor": {
-                        "type": "string"
-                    },
-                    "razonsocial": {
-                        "type": "string"
-                    },
-                    "replegal": {
-                        "type": "string"
-                    },
-                    "rfc": {
-                        "type": "string"
-                    },
-                    "estado": {
-                        "type": "string"
-                    },
-                    "localidad": {
-                        "type": "string"
-                    },
-                    "calle": {
-                        "type": "string"
-                    },
-                    "colonia": {
-                        "type": "string"
-                    },
-                    "redondeocptecho": {
-                        "type": "boolean"
-                    },
-                    "provgastos": {
-                        "type": "boolean"
-                    },
-                    "provmercancia": {
-                        "type": "boolean"
-                    },
-                    "activo": {
-                        "type": "boolean"
-                    },
-                    "contacto": {
-                        "type": "string"
-                    },
-                    "email": {
-                        "type": "string"
-                    }
-                }
-            },
-            "BusquedaClientesRequest": {
-                "type": "object",
-                "properties": {
-                    "codcondicion": {
+                    "nuevaClave": {
                         "type": "string",
-                        "minLength": 1,
-                        "pattern": "^(NOM|APE|RFC|RSO|NNE|CLA|CONT|EMA|)$"
-                    },
-                    "mostrarInactivos": {
-                        "type": "boolean"
-                    },
-                    "condicion": {
-                        "type": "string",
-                        "maxLength": 100,
-                        "minLength": 0
-                    },
-                    "filas": {
-                        "type": "string",
-                        "pattern": "^[1-9][0-9]*$"
+                        "description": "Hash SHA-256 de la nueva clave (64 caracteres hex)",
+                        "example": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+                        "maxLength": 64,
+                        "minLength": 64,
+                        "pattern": "^[a-fA-F0-9]{64}$"
                     }
                 },
                 "required": [
-                    "codcondicion"
+                    "nuevaClave"
                 ]
             },
-            "BusquedaClientesResponse": {
+            "BitacoraUnificadaRequest": {
                 "type": "object",
+                "description": "Filtros para consultar la bitácora unificada de usuarios",
+                "properties": {
+                    "fechaInicio": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Fecha inicial del rango (incluyente)",
+                        "example": "2025-01-01"
+                    },
+                    "fechaFin": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Fecha final del rango (incluyente)",
+                        "example": "2025-01-31"
+                    },
+                    "usuario": {
+                        "type": "string",
+                        "description": "Clave de empleado a consultar",
+                        "example": "USR001",
+                        "minLength": 1
+                    },
+                    "sucursal": {
+                        "type": "string",
+                        "description": "Sucursal a la que pertenece la actividad del usuario",
+                        "example": "S1"
+                    },
+                    "rangoFechasValido": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "fechaFin",
+                    "fechaInicio",
+                    "usuario"
+                ]
+            },
+            "BitacoraUnificadaResponse": {
+                "type": "object",
+                "description": "Resultado de la consulta de bitácora unificada de usuarios",
                 "properties": {
                     "success": {
                         "type": "boolean"
@@ -2930,65 +1230,43 @@
                     "message": {
                         "type": "string"
                     },
-                    "totalResultados": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "clientes": {
+                    "eventos": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/ClienteResultado"
+                            "$ref": "#/components/schemas/BitacoraUsuarioEntry"
                         }
                     }
                 }
             },
-            "ClienteResultado": {
+            "BitacoraUsuarioEntry": {
                 "type": "object",
+                "description": "Evento registrado en la bitácora unificada",
                 "properties": {
-                    "cliente": {
+                    "referencia": {
                         "type": "string"
                     },
-                    "rsocial": {
+                    "tipoDocumento": {
                         "type": "string"
                     },
-                    "nomnegocio": {
+                    "operacion": {
                         "type": "string"
                     },
-                    "rfc": {
-                        "type": "string"
-                    },
-                    "regimenfiscal": {
-                        "type": "string"
-                    },
-                    "contacto": {
-                        "type": "string"
-                    },
-                    "municipio": {
-                        "type": "string"
-                    },
-                    "localidad": {
-                        "type": "string"
-                    },
-                    "calle": {
-                        "type": "string"
-                    },
-                    "colonia": {
-                        "type": "string"
-                    },
-                    "cp": {
-                        "type": "string"
-                    },
-                    "telefono": {
-                        "type": "string"
-                    },
-                    "email": {
-                        "type": "string"
-                    },
-                    "email2": {
-                        "type": "string"
-                    },
-                    "activo": {
+                    "cancelado": {
                         "type": "boolean"
+                    },
+                    "fechaDocumento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "usuario": {
+                        "type": "string"
+                    },
+                    "fechaOperacion": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "horaOperacion": {
+                        "type": "string"
                     }
                 }
             },
@@ -3060,831 +1338,9 @@
                     }
                 }
             },
-            "CondicionComercialProveedorDTO": {
+            "UsuarioListResponse": {
                 "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "descuento": {
-                        "type": "number",
-                        "maximum": 100.0,
-                        "minimum": 0.0
-                    },
-                    "numarticulos": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    },
-                    "importemin": {
-                        "type": "number",
-                        "minimum": 0.0
-                    },
-                    "importemax": {
-                        "type": "number",
-                        "minimum": 0.0
-                    },
-                    "fechaalta": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "usuario": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "fechainicio": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "fechafin": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "comentarios": {
-                        "type": "string",
-                        "maxLength": 100,
-                        "minLength": 0
-                    },
-                    "activo": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "CuentaRetencionProveedorDTO": {
-                "type": "object",
-                "properties": {
-                    "proveedor": {
-                        "type": "string"
-                    },
-                    "cuenta_iva_ret": {
-                        "type": "string",
-                        "maxLength": 20,
-                        "minLength": 0
-                    },
-                    "cuenta_isr_ret": {
-                        "type": "string",
-                        "maxLength": 20,
-                        "minLength": 0
-                    },
-                    "cuenta_ieps_ret": {
-                        "type": "string",
-                        "maxLength": 20,
-                        "minLength": 0
-                    },
-                    "cuenta_ietu_ret": {
-                        "type": "string",
-                        "maxLength": 20,
-                        "minLength": 0
-                    },
-                    "configurado": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "ProveedorRequest": {
-                "type": "object",
-                "description": "Datos del proveedor a grabar",
-                "properties": {
-                    "operacion": {
-                        "type": "string",
-                        "minLength": 1,
-                        "pattern": "^[AM]$"
-                    },
-                    "proveedor": {
-                        "type": "string"
-                    },
-                    "razonsocial": {
-                        "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "tipoempre": {
-                        "type": "string",
-                        "pattern": "^[01]$"
-                    },
-                    "replegal": {
-                        "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "titrepleg": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "fechnrep": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "rfc": {
-                        "type": "string",
-                        "maxLength": 15,
-                        "minLength": 0
-                    },
-                    "curp": {
-                        "type": "string",
-                        "maxLength": 18,
-                        "minLength": 0
-                    },
-                    "calle": {
-                        "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "colonia": {
-                        "type": "string",
-                        "maxLength": 40,
-                        "minLength": 0
-                    },
-                    "cvecolonia": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "cp": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "localidad": {
-                        "type": "string",
-                        "maxLength": 40,
-                        "minLength": 0
-                    },
-                    "estado": {
-                        "type": "string",
-                        "maxLength": 4,
-                        "minLength": 0
-                    },
-                    "pais": {
-                        "type": "string",
-                        "maxLength": 40,
-                        "minLength": 0
-                    },
-                    "contacto": {
-                        "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "emailcto": {
-                        "type": "string",
-                        "format": "email",
-                        "maxLength": 50,
-                        "minLength": 0
-                    },
-                    "fechncon": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email",
-                        "maxLength": 50,
-                        "minLength": 0
-                    },
-                    "limcred": {
-                        "type": "number",
-                        "minimum": 0.0
-                    },
-                    "plazo": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    },
-                    "descuento": {
-                        "type": "number",
-                        "maximum": 100.0,
-                        "minimum": 0.0
-                    },
-                    "descppp": {
-                        "type": "number",
-                        "maximum": 100.0,
-                        "minimum": 0.0
-                    },
-                    "bancoc1": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "bancoc2": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "bancoc3": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "cuentab1": {
-                        "type": "string",
-                        "maxLength": 20,
-                        "minLength": 0
-                    },
-                    "cuentab2": {
-                        "type": "string",
-                        "maxLength": 20,
-                        "minLength": 0
-                    },
-                    "cuentab3": {
-                        "type": "string",
-                        "maxLength": 20,
-                        "minLength": 0
-                    },
-                    "tipocuenta1": {
-                        "type": "string",
-                        "maxLength": 5,
-                        "minLength": 0
-                    },
-                    "tipocuenta2": {
-                        "type": "string",
-                        "maxLength": 5,
-                        "minLength": 0
-                    },
-                    "tipocuenta3": {
-                        "type": "string",
-                        "maxLength": 5,
-                        "minLength": 0
-                    },
-                    "cuentadefault": {
-                        "type": "integer",
-                        "format": "int32",
-                        "maximum": 3,
-                        "minimum": 1
-                    },
-                    "apoyos": {
-                        "type": "string",
-                        "maxLength": 60,
-                        "minLength": 0
-                    },
-                    "fechauap": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "credito": {
-                        "type": "boolean"
-                    },
-                    "reduccostobase": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    },
-                    "porcreduccosto": {
-                        "type": "number",
-                        "maximum": 100.0,
-                        "minimum": 0.0
-                    },
-                    "esparterelac": {
-                        "type": "boolean"
-                    },
-                    "cuadreestcomp": {
-                        "type": "boolean"
-                    },
-                    "cuadreestncre": {
-                        "type": "boolean"
-                    },
-                    "cuadreestpagos": {
-                        "type": "boolean"
-                    },
-                    "cuadreestncar": {
-                        "type": "boolean"
-                    },
-                    "activo": {
-                        "type": "boolean"
-                    },
-                    "redondeocptecho": {
-                        "type": "boolean"
-                    },
-                    "emitencpago": {
-                        "type": "boolean"
-                    },
-                    "comprador": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "provgastos": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "provmercancia": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "esresico": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "impuestoret": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "numcuenta": {
-                        "type": "string",
-                        "maxLength": 30,
-                        "minLength": 0
-                    },
-                    "agrupapagfact": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "agrupapaggast": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "tiporefpago": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "referenciafija": {
-                        "type": "string",
-                        "maxLength": 18,
-                        "minLength": 0
-                    },
-                    "diasvigencia": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "tiporetencion": {
-                        "type": "string",
-                        "maxLength": 15,
-                        "minLength": 0
-                    },
-                    "diasreorden": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 1
-                    },
-                    "capturista": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "mincajas": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    },
-                    "minpeso": {
-                        "type": "number",
-                        "format": "double",
-                        "minimum": 0
-                    },
-                    "mindinero": {
-                        "type": "number",
-                        "format": "double",
-                        "minimum": 0
-                    },
-                    "confianzapedidoautomatico": {
-                        "type": "boolean"
-                    },
-                    "ajuste_bancario": {
-                        "type": "boolean"
-                    },
-                    "cotizable": {
-                        "type": "boolean"
-                    },
-                    "correo_cotizacion": {
-                        "type": "string",
-                        "format": "email",
-                        "maxLength": 100,
-                        "minLength": 0
-                    },
-                    "telefonos": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TelefonoProveedorDTO"
-                        }
-                    },
-                    "condicionComercial": {
-                        "$ref": "#/components/schemas/CondicionComercialProveedorDTO"
-                    },
-                    "cuentaRetencion": {
-                        "$ref": "#/components/schemas/CuentaRetencionProveedorDTO"
-                    }
-                },
-                "required": [
-                    "operacion",
-                    "razonsocial"
-                ]
-            },
-            "TelefonoProveedorDTO": {
-                "type": "object",
-                "properties": {
-                    "lada": {
-                        "type": "string",
-                        "maxLength": 10,
-                        "minLength": 0
-                    },
-                    "telefono": {
-                        "type": "string",
-                        "maxLength": 20,
-                        "minLength": 0
-                    },
-                    "extension": {
-                        "type": "string",
-                        "maxLength": 20,
-                        "minLength": 0
-                    },
-                    "tipo": {
-                        "type": "string",
-                        "maxLength": 100,
-                        "minLength": 0
-                    },
-                    "comentarios": {
-                        "type": "string",
-                        "maxLength": 100,
-                        "minLength": 0
-                    },
-                    "principal": {
-                        "type": "boolean"
-                    }
-                },
-                "required": [
-                    "lada",
-                    "telefono"
-                ]
-            },
-            "CondicionComercialProveedorResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "proveedor": {
-                        "type": "string"
-                    },
-                    "descuento": {
-                        "type": "number"
-                    },
-                    "numarticulos": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "importemin": {
-                        "type": "number"
-                    },
-                    "importemax": {
-                        "type": "number"
-                    },
-                    "fechaalta": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "usuario": {
-                        "type": "string"
-                    },
-                    "fechainicio": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "fechafin": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "comentarios": {
-                        "type": "string"
-                    },
-                    "activo": {
-                        "type": "boolean"
-                    },
-                    "rangoImportes": {
-                        "type": "string"
-                    }
-                }
-            },
-            "CuentaRetencionProveedorResponse": {
-                "type": "object",
-                "properties": {
-                    "proveedor": {
-                        "type": "string"
-                    },
-                    "cuenta_iva_ret": {
-                        "type": "string"
-                    },
-                    "cuenta_isr_ret": {
-                        "type": "string"
-                    },
-                    "cuenta_ieps_ret": {
-                        "type": "string"
-                    },
-                    "cuenta_ietu_ret": {
-                        "type": "string"
-                    },
-                    "configurado": {
-                        "type": "boolean"
-                    },
-                    "cuentasConfiguradas": {
-                        "type": "integer",
-                        "format": "int32"
-                    }
-                }
-            },
-            "ProveedorResponse": {
-                "type": "object",
-                "properties": {
-                    "proveedor": {
-                        "type": "string"
-                    },
-                    "razonsocial": {
-                        "type": "string"
-                    },
-                    "tipoempre": {
-                        "type": "string"
-                    },
-                    "replegal": {
-                        "type": "string"
-                    },
-                    "titrepleg": {
-                        "type": "string"
-                    },
-                    "fechnrep": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "rfc": {
-                        "type": "string"
-                    },
-                    "curp": {
-                        "type": "string"
-                    },
-                    "calle": {
-                        "type": "string"
-                    },
-                    "colonia": {
-                        "type": "string"
-                    },
-                    "cvecolonia": {
-                        "type": "string"
-                    },
-                    "cp": {
-                        "type": "string"
-                    },
-                    "localidad": {
-                        "type": "string"
-                    },
-                    "estado": {
-                        "type": "string"
-                    },
-                    "pais": {
-                        "type": "string"
-                    },
-                    "contacto": {
-                        "type": "string"
-                    },
-                    "emailcto": {
-                        "type": "string"
-                    },
-                    "fechncon": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "email": {
-                        "type": "string"
-                    },
-                    "limcred": {
-                        "type": "number"
-                    },
-                    "plazo": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "descuento": {
-                        "type": "number"
-                    },
-                    "descppp": {
-                        "type": "number"
-                    },
-                    "bancoc1": {
-                        "type": "string"
-                    },
-                    "bancoc2": {
-                        "type": "string"
-                    },
-                    "bancoc3": {
-                        "type": "string"
-                    },
-                    "cuentab1": {
-                        "type": "string"
-                    },
-                    "cuentab2": {
-                        "type": "string"
-                    },
-                    "cuentab3": {
-                        "type": "string"
-                    },
-                    "tipocuenta1": {
-                        "type": "string"
-                    },
-                    "tipocuenta2": {
-                        "type": "string"
-                    },
-                    "tipocuenta3": {
-                        "type": "string"
-                    },
-                    "cuentadefault": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "apoyos": {
-                        "type": "string"
-                    },
-                    "fechauap": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "credito": {
-                        "type": "boolean"
-                    },
-                    "reduccostobase": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "porcreduccosto": {
-                        "type": "number"
-                    },
-                    "esparterelac": {
-                        "type": "boolean"
-                    },
-                    "cuadreestcomp": {
-                        "type": "boolean"
-                    },
-                    "cuadreestncre": {
-                        "type": "boolean"
-                    },
-                    "cuadreestpagos": {
-                        "type": "boolean"
-                    },
-                    "cuadreestncar": {
-                        "type": "boolean"
-                    },
-                    "activo": {
-                        "type": "boolean"
-                    },
-                    "redondeocptecho": {
-                        "type": "boolean"
-                    },
-                    "emitencpago": {
-                        "type": "boolean"
-                    },
-                    "comprador": {
-                        "type": "string"
-                    },
-                    "provgastos": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "provmercancia": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "esresico": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "impuestoret": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "numcuenta": {
-                        "type": "string"
-                    },
-                    "agrupapagfact": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "agrupapaggast": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "tiporefpago": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "referenciafija": {
-                        "type": "string"
-                    },
-                    "diasvigencia": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "tiporetencion": {
-                        "type": "string"
-                    },
-                    "diasreorden": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "capturista": {
-                        "type": "string"
-                    },
-                    "mincajas": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "minpeso": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "mindinero": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "confianzapedidoautomatico": {
-                        "type": "boolean"
-                    },
-                    "ajuste_bancario": {
-                        "type": "boolean"
-                    },
-                    "cotizable": {
-                        "type": "boolean"
-                    },
-                    "correo_cotizacion": {
-                        "type": "string"
-                    },
-                    "fechaalta": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "fechacambio": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "usualta": {
-                        "type": "string"
-                    },
-                    "usumodi": {
-                        "type": "string"
-                    },
-                    "telefonos": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TelefonoProveedorResponse"
-                        }
-                    },
-                    "condicionesComerciales": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/CondicionComercialProveedorResponse"
-                        }
-                    },
-                    "cuentaRetencion": {
-                        "$ref": "#/components/schemas/CuentaRetencionProveedorResponse"
-                    },
-                    "estadoDescripcion": {
-                        "type": "string"
-                    },
-                    "compradorDescripcion": {
-                        "type": "string"
-                    },
-                    "impuestoDescripcion": {
-                        "type": "string"
-                    },
-                    "tipoEmpresaDescripcion": {
-                        "type": "string"
-                    },
-                    "criterioPedidoAutomatico": {
-                        "type": "string"
-                    },
-                    "tipoProveedor": {
-                        "type": "string"
-                    }
-                }
-            },
-            "TelefonoProveedorResponse": {
-                "type": "object",
-                "properties": {
-                    "proveedor": {
-                        "type": "string"
-                    },
-                    "lada": {
-                        "type": "string"
-                    },
-                    "telefono": {
-                        "type": "string"
-                    },
-                    "extension": {
-                        "type": "string"
-                    },
-                    "tipo": {
-                        "type": "string"
-                    },
-                    "comentarios": {
-                        "type": "string"
-                    },
-                    "principal": {
-                        "type": "boolean"
-                    },
-                    "telefonoCompleto": {
-                        "type": "string"
-                    }
-                }
-            },
-            "ClienteListResponse": {
-                "type": "object",
+                "description": "Listado de usuarios con metadatos",
                 "properties": {
                     "success": {
                         "type": "boolean"
@@ -3892,128 +1348,81 @@
                     "message": {
                         "type": "string"
                     },
-                    "clientes": {
+                    "usuarios": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/ClienteResumen"
+                            "$ref": "#/components/schemas/UsuarioSummary"
                         }
-                    },
-                    "totalRegistros": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "pagina": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "registrosPorPagina": {
-                        "type": "integer",
-                        "format": "int32"
                     }
                 }
             },
-            "ClienteResumen": {
+            "UsuarioSummary": {
                 "type": "object",
                 "properties": {
-                    "cliente": {
+                    "empleado": {
                         "type": "string"
                     },
                     "nombre": {
                         "type": "string"
                     },
-                    "appat": {
-                        "type": "string"
+                    "ultimoAcceso": {
+                        "type": "string",
+                        "format": "date"
                     },
-                    "apmat": {
+                    "activo": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "EmpleadoOptionResponse": {
+                "type": "object",
+                "description": "Elemento para combos de selección de empleados",
+                "properties": {
+                    "empleado": {
                         "type": "string"
                     },
                     "nombreCompleto": {
                         "type": "string"
                     },
-                    "rsocial": {
-                        "type": "string"
-                    },
-                    "nomnegocio": {
-                        "type": "string"
-                    },
-                    "rfc": {
-                        "type": "string"
-                    },
-                    "tipoempre": {
-                        "type": "string"
-                    },
-                    "tipoempresaNombre": {
-                        "type": "string"
-                    },
-                    "activo": {
+                    "tieneUsuario": {
                         "type": "boolean"
-                    },
-                    "credito": {
-                        "type": "boolean"
-                    },
-                    "limcred": {
-                        "type": "number"
-                    },
-                    "bloqueo": {
+                    }
+                }
+            },
+            "UsuarioComboOptionResponse": {
+                "type": "object",
+                "description": "Elemento para ComboBox general de usuarios",
+                "properties": {
+                    "empleado": {
                         "type": "string"
                     },
-                    "bloqueoNombre": {
+                    "nombreCompleto": {
                         "type": "string"
                     },
                     "sucursal": {
                         "type": "string"
-                    },
-                    "fechaalta": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "fechamodi": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "telefonoPrincipal": {
+                    }
+                }
+            },
+            "SucursalComboOptionResponse": {
+                "type": "object",
+                "description": "Elemento para ComboBox general de sucursales",
+                "properties": {
+                    "sucursal": {
                         "type": "string"
                     },
-                    "email": {
-                        "type": "string"
-                    },
-                    "direccionCompleta": {
-                        "type": "string"
-                    },
-                    "coloniaNombre": {
-                        "type": "string"
-                    },
-                    "cp": {
-                        "type": "string"
-                    },
-                    "vendedor": {
-                        "type": "string"
-                    },
-                    "vendedorNombre": {
-                        "type": "string"
-                    },
-                    "cobrador": {
-                        "type": "string"
-                    },
-                    "cobradorNombre": {
+                    "nombre": {
                         "type": "string"
                     }
                 }
             },
-            "Pageable": {
+            "ObjetoPrivilegiosDTO": {
                 "type": "object",
                 "properties": {
-                    "page": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
+                    "objeto": {
+                        "type": "string"
                     },
-                    "size": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 1
-                    },
-                    "sort": {
+                    "privilegios": {
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -4021,154 +1430,48 @@
                     }
                 }
             },
-            "Page": {
+            "PrivilegioDTO": {
                 "type": "object",
                 "properties": {
-                    "totalElements": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "totalPages": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "numberOfElements": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "pageable": {
-                        "$ref": "#/components/schemas/PageableObject"
-                    },
-                    "first": {
-                        "type": "boolean"
-                    },
-                    "last": {
-                        "type": "boolean"
-                    },
-                    "size": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "content": {
-                        "type": "array",
-                        "items": {
-                        }
-                    },
-                    "number": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "sort": {
-                        "$ref": "#/components/schemas/SortObject"
-                    },
-                    "empty": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "PageableObject": {
-                "type": "object",
-                "properties": {
-                    "paged": {
-                        "type": "boolean"
-                    },
-                    "pageSize": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "pageNumber": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "unpaged": {
-                        "type": "boolean"
-                    },
-                    "offset": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "sort": {
-                        "$ref": "#/components/schemas/SortObject"
-                    }
-                }
-            },
-            "SortObject": {
-                "type": "object",
-                "properties": {
-                    "sorted": {
-                        "type": "boolean"
-                    },
-                    "unsorted": {
-                        "type": "boolean"
-                    },
-                    "empty": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "PageProveedorResponse": {
-                "type": "object",
-                "properties": {
-                    "totalElements": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "totalPages": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "numberOfElements": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "pageable": {
-                        "$ref": "#/components/schemas/PageableObject"
-                    },
-                    "first": {
-                        "type": "boolean"
-                    },
-                    "last": {
-                        "type": "boolean"
-                    },
-                    "size": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "content": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ProveedorResponse"
-                        }
-                    },
-                    "number": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "sort": {
-                        "$ref": "#/components/schemas/SortObject"
-                    },
-                    "empty": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "BajaClienteRequest": {
-                "type": "object",
-                "properties": {
-                    "cliente": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "motivo": {
+                    "objeto": {
                         "type": "string"
                     },
-                    "confirmarEliminacion": {
+                    "privilegio": {
+                        "type": "string"
+                    },
+                    "descripcion": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PrivilegeCheckResponse": {
+                "type": "object",
+                "properties": {
+                    "objeto": {
+                        "type": "string"
+                    },
+                    "privilegio": {
+                        "type": "string"
+                    },
+                    "allowed": {
                         "type": "boolean"
                     }
-                },
-                "required": [
-                    "cliente"
-                ]
+                }
+            },
+            "VersionRequirementDTO": {
+                "type": "object",
+                "properties": {
+                    "versionMinima": {
+                        "type": "string"
+                    },
+                    "subversionMinima": {
+                        "type": "string"
+                    },
+                    "tiempoValidezMinutos": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
             }
         },
         "securitySchemes": {

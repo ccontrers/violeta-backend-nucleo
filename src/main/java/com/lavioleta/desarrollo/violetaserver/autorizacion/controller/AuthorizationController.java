@@ -82,6 +82,14 @@ public class AuthorizationController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/cache/self")
+    public ResponseEntity<Void> flushCachePropio(Principal principal) {
+        String usuario = resolveUsuario(principal);
+        log.info("Cache de privilegios invalidada para usuario autenticado={}", usuario);
+        authorizationService.evictUsuario(usuario);
+        return ResponseEntity.noContent().build();
+    }
+
     private String resolveUsuario(Principal principal) {
         if (principal == null || !StringUtils.hasText(principal.getName())) {
             throw new IllegalStateException("No se pudo resolver el usuario autenticado");
