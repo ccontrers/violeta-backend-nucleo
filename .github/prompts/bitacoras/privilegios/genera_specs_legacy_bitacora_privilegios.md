@@ -1,5 +1,5 @@
 Genera un documento en formato Markdown con el nombre y path:
-	.\docs\spec-legacy-bitacora-privilegios.md
+	.\docs\bitacoras\privilegios\spec-legacy-bitacora-privilegios.md
 	
 El objetivo es describir con el máximo detalle técnico posible la implementación actual del módulo de bitácora de modificaciones de privilegios en el sistema legado, de forma que un programador pueda entender exactamente cómo funciona el código existente y reprogramarlo fielmente en otra tecnología. 
 
