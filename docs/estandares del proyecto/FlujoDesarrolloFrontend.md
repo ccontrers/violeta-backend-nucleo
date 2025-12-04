@@ -63,20 +63,20 @@ Ejemplo revisar `spec-legacy-busqueda-proveedores.md`
 ## 7. Crear un prompt de proceso frontend
 Crear un prompt para describir los casos de uso deducibles del módulo que se va a migrar, basándose en know how entendible en el código legado y en la especificación técnica generada en el paso anterior.
 
-Ejemplo, se puede copiar y editar un prompt similar a `.github/prompts/busquedas/proveedores/genera_proceso_migracion_frontend.prompt.md`
+Ejemplo, se puede copiar y editar un prompt similar a `.github\prompts\7-generar_proceso-plantilla.md`
 
-# 8. Revisión del prompt de proceso frontend
+## 8. Revisión del prompt de proceso frontend
 Indicarle a Copilot que revise el prompt que genera un archivo de proceso de la parte legada.
 
 En github copilot con el modelo GPT-5 (codex) en modo agente:
 
-> Revisa el siguiente documento y corrígelo interactuando conmigo sobre los hallazgos para hacer el documento lo más preciso y completo posible, también evalúa que no haya archivos faltantes o ambigüedad: `.github/prompts/genera_proceso_migracion_frontend.prompt.md`
+> Revisa el siguiente documento y corrígelo interactuando conmigo sobre los hallazgos para hacer el documento lo más preciso y completo posible, también evalúa que no haya archivos faltantes o ambigüedad: `docs/{tipo_módulo}/{entidad_módulo}/proceso_legacy_{tipo_módulo}_{entidad_módulo}.md`
 
 ## 9.- Ejecutar el prompt de proceso frontend
 Indicarle a Copilot que genere un archivo de proceso tipo markdown con base a la especificación que mandemos, indicando que debe ser un proceso detallado para migrar la funcionalidad del módulo legado al nuevo frontend.
 
 En github copilot con el modelo GPT-5 (codex) en modo agente:
-> Ejecuta las tareas indicadas en el documento siguiente: `.github/prompts/busquedas/proveedores/genera_proceso_migracion_frontend.prompt.md`
+> Ejecuta las tareas indicadas en el documento siguiente: `docs/{tipo_módulo}/{entidad_módulo}/proceso_legacy_{tipo_módulo}_{entidad_módulo}.md`
 
 ## 10.- Crear prompt de migración frontend
 Crear un prompt para detallas los comandos de migración de la función legada que se va a migrar. Se puede basar en una plantilla de un módulo con funcionalidad similar.
@@ -89,7 +89,7 @@ Por ejemplo se puede usar `.github/prompts/migrar_busqueda_proveedores.md`
 En github copilot con el modelo GPT-5 (codex) en modo agente:
 > Crea un documento de migración frontend basado en la especificación técnica `docs/busquedas/proveedores/` y el proceso de migración generados previamente. El documento debe detallar los pasos necesarios para migrar la funcionalidad del módulo legado al nuevo frontend, incluyendo referencias a la estructura actualizada de peticiones y respuestas de la API de núcleo backend migrado, así como a los nuevos componentes que se usarán en la migración. Usa el siguiente formato de documento: `.github/prompts/migrar_busqueda_proveedores.md`
 
-## 10.- Indicarle a Copilot que revise el prompt para la migración.
+## 11.- Indicarle a Copilot que revise el prompt para la migración.
 
 En github copilot con el modelo GPT-5 (codex) en modo agente:
 

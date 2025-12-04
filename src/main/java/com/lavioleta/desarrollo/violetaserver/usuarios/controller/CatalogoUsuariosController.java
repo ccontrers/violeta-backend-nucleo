@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioComboOptionResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.service.CatalogoUsuariosService;
@@ -195,5 +196,24 @@ public class CatalogoUsuariosController {
             return header;
         }
         return request.getRemoteAddr();
+    }
+
+    @GetMapping("/combo-box")
+    @Operation(summary = "ComboBox de usuarios", description = "Lista usuarios para llenar combos generales, con filtro opcional por sucursal.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Consulta ejecutada"),
+            @ApiResponse(responseCode = "500", description = "Error interno")
+    })
+    public ResponseEntity<List<UsuarioComboOptionResponse>> comboUsuarios(
+            @RequestParam(value = "sucursal", required = false) String sucursal,
+            HttpServletRequest request) {
+        try {
+            log.debug("Consultando combo de usuarios desde IP {} (sucursal={})", obtenerClientIp(request), sucursal);
+            List<UsuarioComboOptionResponse> items = service.listarUsuariosCombo(sucursal);
+            return ResponseEntity.ok(items);
+        } catch (Exception ex) {
+            log.error("Error inesperado al consultar combo de usuarios", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

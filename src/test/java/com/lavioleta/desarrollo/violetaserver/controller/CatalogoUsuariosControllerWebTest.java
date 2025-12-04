@@ -3,6 +3,7 @@ package com.lavioleta.desarrollo.violetaserver.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,6 +32,7 @@ import com.lavioleta.desarrollo.violetaserver.config.TestSecurityConfig;
 import com.lavioleta.desarrollo.violetaserver.usuarios.controller.CatalogoUsuariosController;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioComboOptionResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.service.CatalogoUsuariosService;
@@ -330,6 +332,36 @@ class CatalogoUsuariosControllerWebTest {
                         when(service.obtenerEmpleadosDisponibles()).thenThrow(new RuntimeException("err"));
 
                         mockMvc.perform(get(BASE + "/empleados-disponibles"))
+                                        .andExpect(status().isInternalServerError());
+                }
+        }
+
+        @Nested
+        @DisplayName("GET /api/v1/usuarios/combo-box")
+        class ComboUsuarios {
+                @Test
+                @DisplayName("Combo usuarios -> 200")
+                void comboOk() throws Exception {
+                        List<UsuarioComboOptionResponse> combo = List.of(
+                                        UsuarioComboOptionResponse.builder()
+                                                        .empleado("EMP1")
+                                                        .nombreCompleto("Nombre 1")
+                                                        .sucursal("S1")
+                                                        .build());
+                        when(service.listarUsuariosCombo(anyString())).thenReturn(combo);
+
+                        mockMvc.perform(get(BASE + "/combo-box")
+                                        .param("sucursal", "S1"))
+                                        .andExpect(status().isOk())
+                                        .andExpect(jsonPath("$[0].empleado").value("EMP1"));
+                }
+
+                @Test
+                @DisplayName("Combo usuarios excepción -> 500")
+                void comboError() throws Exception {
+                        when(service.listarUsuariosCombo(isNull())).thenThrow(new RuntimeException("boom"));
+
+                        mockMvc.perform(get(BASE + "/combo-box"))
                                         .andExpect(status().isInternalServerError());
                 }
         }

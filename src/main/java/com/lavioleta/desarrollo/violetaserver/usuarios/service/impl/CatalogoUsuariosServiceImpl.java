@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.request.UsuarioRequest;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.EmpleadoOptionResponse;
+import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioComboOptionResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioListResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.dto.response.UsuarioResponse;
 import com.lavioleta.desarrollo.violetaserver.usuarios.repository.CatalogoUsuariosRepository;
@@ -120,6 +121,11 @@ public class CatalogoUsuariosServiceImpl implements CatalogoUsuariosService {
     @Override
     public List<EmpleadoOptionResponse> obtenerEmpleadosDisponibles() {
         return repository.listarEmpleadosDisponibles();
+    }
+
+    @Override
+    public List<UsuarioComboOptionResponse> listarUsuariosCombo(String sucursal) {
+        return repository.listarUsuariosCombo(sucursal);
     }
 
     private String resolveSucursal(String sucursalHeader) {

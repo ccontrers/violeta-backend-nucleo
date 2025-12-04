@@ -152,8 +152,11 @@ public class ClaveUsuarioController {
         ),
         @ApiResponse(
             responseCode = "409",
-            description = "Conflicto (reservado para futuras validaciones)",
-            content = @Content(mediaType = "application/json")
+            description = "Conflicto: la nueva clave es igual a la actual",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"success\":false,\"usuario\":null,\"message\":\"La nueva clave no puede ser igual a la clave actual\"}")
+            )
         )
     })
     public ResponseEntity<ClaveResponse> cambiarClave(
@@ -172,6 +175,8 @@ public class ClaveUsuarioController {
                 status = HttpStatus.NOT_FOUND;
             } else if (response.getMessage() != null && response.getMessage().contains("no es correcta")) {
                 status = HttpStatus.UNAUTHORIZED;
+            } else if (response.getMessage() != null && response.getMessage().contains("igual a la clave actual")) {
+                status = HttpStatus.CONFLICT;
             } else {
                 status = HttpStatus.BAD_REQUEST;
             }
