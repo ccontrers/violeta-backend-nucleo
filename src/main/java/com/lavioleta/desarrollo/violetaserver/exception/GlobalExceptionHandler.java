@@ -6,6 +6,8 @@ import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -76,6 +78,13 @@ public class GlobalExceptionHandler {
         logger.info("Resource not found: {}", ex.getResourcePath());
         ApiError body = build(req, HttpStatus.NOT_FOUND, "Recurso no encontrado", "RESOURCE_NOT_FOUND", null);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
+    public ResponseEntity<ApiError> handleAccessDenied(Exception ex, HttpServletRequest req) {
+        logger.warn("Access denied: {}", ex.getMessage());
+        ApiError body = build(req, HttpStatus.FORBIDDEN, "Acceso denegado", "ACCESS_DENIED", null);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
     @ExceptionHandler(RuntimeException.class)

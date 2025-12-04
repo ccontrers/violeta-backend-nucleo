@@ -1,5 +1,6 @@
 package com.lavioleta.desarrollo.violetaserver.config;
 
+import com.lavioleta.desarrollo.violetaserver.autorizacion.security.AuthorityPopulatorFilter;
 import com.lavioleta.desarrollo.violetaserver.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,9 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired(required = false)
+    private AuthorityPopulatorFilter authorityPopulatorFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -63,6 +67,11 @@ public class SecurityConfig {
             // Agregar filtro JWT ANTES del filtro de sesiones
             // Esto permite que primero intente JWT, y si no hay token, usa sesiones
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        if (authorityPopulatorFilter != null) {
+            // Poblar autoridades dinámicas después del filtro de autenticación estándar
+            http.addFilterAfter(authorityPopulatorFilter, UsernamePasswordAuthenticationFilter.class);
+        }
 
         return http.build();
     }
