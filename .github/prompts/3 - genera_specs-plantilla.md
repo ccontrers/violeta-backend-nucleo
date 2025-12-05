@@ -11,11 +11,14 @@ Instrucciones específicas:
 	- `Form{TipoModulo}{EntidadModulo}.cpp`
 	- `Form{TipoModulo}{EntidadModulo}.h`
 	- `Form{TipoModulo}{EntidadModulo}.dfm`
+	- `cpp/Class{EntidadBackend}.cpp`
+	- `cpp/Class{EntidadBackend}.h`
+
 	  Para identificar:
 	- La estructura completa del formulario (componentes, eventos, bindings).
 	- El flujo de ejecución desde la acción del usuario hasta la obtención y despliegue de resultados.
 	- Las funciones o métodos internos que gestionan la lógica del `{tipo_modulo}`, filtrado, carga y visualización.
-2. Analiza las funciones backend que son ejecutadas llamando al servidor buscando "gClienteVioleta->InicializaPeticion()", "gClienteVioleta->EjecutaSqlSelect()" o del tipo "gClienteVioleta->Interfaz->Llena*". Para documentar:
+2. Analiza las funciones backend de `ClassServidor{EntidadBackend}` que son ejecutadas llamando al servidor buscando "gClienteVioleta->InicializaPeticion()", "gClienteVioleta->EjecutaSqlSelect()" o del tipo "gClienteVioleta->Interfaz->Llena*". Para documentar:
 	- Las consultas SQL exactas que ejecuta.
 	- La lógica de filtros (qué condiciones se aplican según si se está modificando o haciendo una función específica).
 	- Cómo se construye el query dinámicamente.
@@ -31,7 +34,7 @@ Instrucciones específicas:
 1. Introducción técnica general
 - Descripción del propósito del módulo de `{tipo_modulo}` de `{entidad_modulo}` dentro del sistema.
 - Arquitectura funcional actual (interfaz, capa lógica, capa de datos).
-- Diagrama o flujo de ejecución entre cliente (formulario) y servidor (`ClassServidor{EntidadBackend}`).
+- Diagrama o flujo de ejecución entre cliente (formulario) y servidor (`Class{EntidadBackend}`).
 
 2. Estructura de la interfaz (Form)
 - Componentes principales definidos en el .dfm

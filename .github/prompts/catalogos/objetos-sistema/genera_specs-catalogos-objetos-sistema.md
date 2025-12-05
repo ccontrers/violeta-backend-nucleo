@@ -7,15 +7,17 @@ El documento no debe incluir sugerencias de mejora, migración o modernización,
 
 Instrucciones específicas:
 
-1. Explora el código fuente de la interfaz legada en los archivos:
-	- `FormCatalogoObjetosSistema.cpp`
-	- `FormCatalogoObjetosSistema.h`
-	- `FormCatalogoObjetosSistema.dfm`
+1. Explora el código fuente de la interfaz legada y el backend en los archivos:
+	- `cpp/FormCatalogoObjetosSistema.cpp`
+	- `cpp/FormCatalogoObjetosSistema.h`
+	- `cpp/FormCatalogoObjetosSistema.dfm`
+	- `cpp/ClassServidorCatalogos.cpp`
+	- `cpp/ClassServidorCatalogos.h`
 	  Para identificar:
 	- La estructura completa del formulario (componentes, eventos, bindings).
 	- El flujo de ejecución desde la acción del usuario hasta la obtención y despliegue de resultados.
 	- Las funciones o métodos internos que gestionan la lógica del `catalogo`, filtrado, carga y visualización.
-2. Analiza las funciones backend que son ejecutadas llamando al servidor buscando "gClienteVioleta->InicializaPeticion()", "gClienteVioleta->EjecutaSqlSelect()" o del tipo "gClienteVioleta->Interfaz->Llena*". Para documentar:
+2. Analiza las funciones backend de `ClassServidorCatalogos` que son ejecutadas llamando al servidor buscando "gClienteVioleta->InicializaPeticion()", "gClienteVioleta->EjecutaSqlSelect()" o del tipo "gClienteVioleta->Interfaz->Llena*". Para documentar:
 	- Las consultas SQL exactas que ejecuta.
 	- La lógica de filtros (qué condiciones se aplican según si se está modificando o haciendo una función específica).
 	- Cómo se construye el query dinámicamente.
@@ -31,7 +33,7 @@ Instrucciones específicas:
 1. Introducción técnica general
 - Descripción del propósito del módulo de `catalogo` de `objetos-sistema` dentro del sistema.
 - Arquitectura funcional actual (interfaz, capa lógica, capa de datos).
-- Diagrama o flujo de ejecución entre cliente (formulario) y servidor (`ClassServidorServidorCatalogos`).
+- Diagrama o flujo de ejecución entre cliente (formulario) y servidor (`ClassServidorCatalogos`).
 
 2. Estructura de la interfaz (Form)
 - Componentes principales definidos en el .dfm
