@@ -31,7 +31,7 @@ función legada que se va a migrar. Se puede basar en otro prompt con
 funcionalidad similar.
 
 >Ejemplo: Se edita el documento y se cambia lo que sea diferente para el
-módulo que pensamos migrar, por ejemplo `genera_specs_legacy_busqueda_vendedores.md`
+módulo que pensamos migrar, por ejemplo `.github\prompts\3 - genera_specs-plantilla.md`
 
 ### 4.- Revisión de generación de especificaciones
 Indicarle a Copilot que revise un prompt que genera un archivo de especificación de la parte legada.
@@ -39,41 +39,37 @@ Indicarle a Copilot que revise un prompt que genera un archivo de especificació
  En github copilot con el modelo GPT-5 (codex) en modo agente:
 
 PROMPT: 
-> Revisa el siguiente documento y corrígelo interactuando conmigo sobre los hallazgos para hacer el documento lo más preciso y completo posible, también evalúa que no haya archivos faltantes o ambigüedad: `genera_specs_legacy_busqueda_vendedores.md`
+> Revisa el siguiente documento y corrígelo interactuando conmigo sobre los hallazgos para hacer el documento lo más preciso y completo posible, también evalúa que no haya archivos faltantes o ambigüedad: `.github/prompts/{tipo_modulo}/{entidad_modulo}/genera_specs_legacy_{tipo_modulo}-{entidad_modulo}.md`
 
 ### 5.- Generar las especificaciones
 Indicarle a Copilot que genere un archivo de especificación tipo markdown con base a la especificación que mandemos, indicando que debe ser una especificación técnica que tiene como objetivo un programado que va a implementar la aplicación.
 
 En github copilot con el modelo GPT-5 (codex) en modo agente:
 
->PROMPT: Ejecuta las tareas indicadas en el documento siguiente:  
-`prompts/genera_specs_legacy_busqueda_vendedores.md`
+>PROMPT: Ejecuta las tareas indicadas en el documento siguiente: `.github/prompts/{tipo_modulo}/{entidad_modulo}/genera_specs_legacy_{tipo_modulo}-{entidad_modulo}.md`
 
 ### 6.- Revisar el archivo de especificaciones generado
 
 Ejemplo revisar
-`spec-legacy-busqueda-vendedores.md`
+`docs/{tipo_modulo}/{entidad_modulo}/spec-legacy-{tipo_modulo}-{entidad_modulo}.md`
 
 ### 7.- Creación de prompt de migración
 Crear un prompt para detallar los comandos de migración de la función legada que se va a migrar. Se puede basar en una plantilla de un módulo con funcionalidad similar.
 
- Se edita el documento y se cambia lo que es diferente para el módulo
-que pensamos migrar:  
-`prompts/migrar_busqueda_vendedores.md`
+Se edita el documento y se cambia lo que es diferente para el módulo que pensamos migrar: `.github/prompts/7 - migrar-plantilla.md`
 
 ### 8.- Revisión del prompt de migración con Copilot
 
  En github copilot con el modelo GPT-5 (codex) en modo agente:
 
->PROMPT: Revisa el siguiente documento y corrígelo interactuando conmigo sobre los hallazgos para hacer el documento lo más preciso y completo posible, también evalúa que no haya archivos faltantes o ambigüedad: `prompts/migrar_busqueda_vendedores.md`
+>PROMPT: Revisa el siguiente documento y corrígelo interactuando conmigo sobre los hallazgos para hacer el documento lo más preciso y completo posible, también evalúa que no haya archivos faltantes o ambigüedad: `.github/prompts/{tipo_modulo}/{entidad_modulo}/migrar_{tipo_modulo}-{entidad_modulo}.md`
 
 ### 9.- Ejecutar la migración
 Decirle a Copilot que implemente la migración indicada en el documento correspondiente:
 
 En github copilot con el modelo CLAUDE SONNET 4.5 en modo agente:
 
->PROMPT: Ejecuta las tareas indicadas en el documento siguiente:  
-`prompts/migrar_busqueda_vendedores.md`
+>PROMPT: Ejecuta las tareas indicadas en el documento siguiente: `.github/prompts/{tipo_modulo}/{entidad_modulo}/migrar_{tipo_modulo}-{entidad_modulo}.md`
 
 - Darle seguimiento a lo que va haciendo, pararlo si es necesario
 cuando este haciendo cosas incorrectas, aclararle y continuar.
@@ -83,12 +79,9 @@ Probar la funcionalidad y revisar el código y lo que va generando, e iterar en 
 ----------------------------------------------------------------------
 
 ## Tips para desarrollar con Github Copilot
-- Darle keep en cada logro y comitear. Revisar lo que se comitea, para
-  detectar que la IA no haya modificado cosas fuera del alcance de su
-  tarea.
+- Darle keep en cada logro y comitear. Revisar lo que se comitea, para detectar que la IA no haya modificado cosas fuera del alcance de su tarea.
 
-- Usar los checkpoints cuando el prompt o lo que hizo copilot estuvo
-  incorrecto.
+- Usar los checkpoints cuando el prompt o lo que hizo copilot estuvo incorrecto.
 
 - Agregar en un archivo `/copilot-rules.md` las indicaciones generales para el proyecto, tener ya reglas predeterminadas por ejemplo para scripts en python, indicaciones de nuestra plataforma de desarrollo, tipo de base de datos, etc.
 - Interactuar con el agente, detenerlo, darle tips, preguntarle, precisar. etc.
