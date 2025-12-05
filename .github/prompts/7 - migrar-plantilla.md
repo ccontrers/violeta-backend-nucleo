@@ -2,11 +2,13 @@ Quiero que realices la migración de una funcionalidad de backend legada desde C
 
 Contexto:
 - La interfaz de usuario está en los archivos:
-	- `Form{TipoModulo}{EntidadModulo}.cpp`
-	- `Form{TipoModulo}{EntidadModulo}.h`
-	- `Form{TipoModulo}{EntidadModulo}.dfm`
+	- `cpp/Form{TipoModulo}{EntidadModulo}.cpp`
+	- `cpp/Form{TipoModulo}{EntidadModulo}.h`
+	- `cpp/Form{TipoModulo}{EntidadModulo}.dfm`
+	- `cpp/Class{EntidadBackend}.cpp`
+	- `cpp/Class{EntidadBackend}.h`
 	tómalo como referencia para establecer la forma en que se usa el backend legado que debe ser similar en el API migrada que se genere.
-- Las funciones que serán migradas se encuentran mencionadas en la sección `3. Lógica de negocios` del documento  `docs/{tipo_modulo}/{entidad_modulo}/spec-legacy-{tipo_modulo}-{entidad_modulo}.md`
+- Las funciones que serán migradas se encuentran mencionadas en la sección `Lógica de negocios` del documento  `docs/{tipo_modulo}/{entidad_modulo}/spec-legacy-{tipo_modulo}-{entidad_modulo}.md`
 
 Reglas y lineamientos:
 

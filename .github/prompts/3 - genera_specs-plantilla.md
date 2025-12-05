@@ -8,9 +8,9 @@ El documento no debe incluir sugerencias de mejora, migración o modernización,
 Instrucciones específicas:
 
 1. Explora el código fuente de la interfaz legada en los archivos:
-	- `Form{TipoModulo}{EntidadModulo}.cpp`
-	- `Form{TipoModulo}{EntidadModulo}.h`
-	- `Form{TipoModulo}{EntidadModulo}.dfm`
+	- `cpp/Form{TipoModulo}{EntidadModulo}.cpp`
+	- `cpp/Form{TipoModulo}{EntidadModulo}.h`
+	- `cpp/Form{TipoModulo}{EntidadModulo}.dfm`
 	- `cpp/Class{EntidadBackend}.cpp`
 	- `cpp/Class{EntidadBackend}.h`
 
