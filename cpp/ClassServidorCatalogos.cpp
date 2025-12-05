@@ -16852,7 +16852,7 @@ void ServidorCatalogos::EliminarArticulo(RespuestaServidor *Respuesta, MYSQL *My
 					instrucciones[num_instrucciones++]=Instruccion;
 
 					Instruccion.sprintf("UPDATE drecepciones d \
-					INNER JOIN tmpdrecepciones tmpd ON tmpd.referencia = d.referencia AND d.articulo = tmpd.articulo \
+					INNER JOIN tmpdrecepciones tmpd ON tmpd.referencia = d.recepcion AND d.articulo = tmpd.articulo \
 					SET \
 					d.cantidad = (d.cantidad+IFNULL(tmpd.cantidadsumar,0)) ");
 					instrucciones[num_instrucciones++]=Instruccion;
@@ -17678,9 +17678,6 @@ void ServidorCatalogos::EliminarArticulo(RespuestaServidor *Respuesta, MYSQL *My
 		Instruccion.sprintf("DELETE FROM bitacorasolicitudesnotascredcli WHERE articulo = @articulo_borrar");
 		instrucciones[num_instrucciones++]=Instruccion;
 
-		Instruccion.sprintf("DELETE FROM imagenesarticulos WHERE articulo = @articulo_borrar");
-		instrucciones[num_instrucciones++]=Instruccion;
-
 		Instruccion.sprintf("DELETE FROM articuloempresacfg WHERE articulo = @articulo_borrar");
 		instrucciones[num_instrucciones++]=Instruccion;
 
@@ -17712,6 +17709,21 @@ void ServidorCatalogos::EliminarArticulo(RespuestaServidor *Respuesta, MYSQL *My
 		instrucciones[num_instrucciones++]=Instruccion;
 
 		Instruccion.sprintf("DELETE FROM pesopromporarticulo WHERE articulo = @articulo_borrar");
+		instrucciones[num_instrucciones++]=Instruccion;
+
+		Instruccion.sprintf("DELETE FROM bitacoraconfiguracionprecios WHERE articulo = @articulo_borrar");
+		instrucciones[num_instrucciones++]=Instruccion;
+
+		Instruccion.sprintf("DELETE FROM compraspedidosprov WHERE articulo = @articulo_borrar");
+		instrucciones[num_instrucciones++]=Instruccion;
+
+		Instruccion.sprintf("DELETE FROM camprogprodpresent WHERE articulo = @articulo_borrar");
+		instrucciones[num_instrucciones++]=Instruccion;
+
+		Instruccion.sprintf("DELETE FROM articulosemp WHERE articulo = @articulo_borrar");
+		instrucciones[num_instrucciones++]=Instruccion;
+
+		Instruccion.sprintf("DELETE FROM imagenesarticulos WHERE producto=@producto AND present=@present ");
 		instrucciones[num_instrucciones++]=Instruccion;
 
 		Instruccion.sprintf("UPDATE presentaciones SET factortarima = (factortarima/@min_factor_reemplazo) \
