@@ -28,27 +28,30 @@ public class LoginRepository {
      */
     public Optional<UsuarioInfo> verificarCredenciales(String usuario, String passwordHash, String sucursalSeleccionada) {
         // Query con JOIN para obtener nombre del empleado y nombre de la sucursal seleccionada
-        String sql = """
-            SELECT u.empleado, u.password, u.activo,
-                   CONCAT(e.nombre, ' ', e.appat, ' ', e.apmat) as nombre_completo,
-                   ? as sucursal,
-                   s.nombre as sucursal_nombre,
-                   s.idempresa,
-                   'Usuario' as perfil
-            FROM usuarios u
-            INNER JOIN empleados e ON u.empleado = e.empleado
-            LEFT JOIN sucursales s ON s.sucursal = ?
-            WHERE u.empleado = ?
-            """;
+         String sql = """
+             SELECT u.empleado, u.password, u.activo,
+                 CONCAT(e.nombre, ' ', e.appat, ' ', e.apmat) AS nombre_completo,
+                 us.sucursal AS sucursal,
+                 s.nombre AS sucursal_nombre,
+                 s.idempresa,
+                 emp.nombre AS empresa_nombre,
+                 'Usuario' AS perfil
+             FROM usuarios u
+             INNER JOIN empleados e ON u.empleado = e.empleado
+             INNER JOIN usuariosucursal us ON us.usuario = u.empleado AND us.sucursal = ?
+             INNER JOIN sucursales s ON s.sucursal = us.sucursal
+             INNER JOIN empresas emp ON emp.idempresa = s.idempresa
+             WHERE u.empleado = ?
+             """;
         
         logger.info("Verificando credenciales para usuario: {} en sucursal: {}", usuario, sucursalSeleccionada);
         logger.debug("SQL: {}", sql);
         
         try {
-            return jdbcClient.sql(sql)
-                    .param(sucursalSeleccionada)        // Sucursal seleccionada (primer ?)
-                    .param(sucursalSeleccionada)        // Para el JOIN con sucursales (segundo ?)
-                    .param(usuario.toUpperCase())       // Usuario (tercer ?)
+                String usuarioUpper = usuario.toUpperCase();
+                return jdbcClient.sql(sql)
+                    .param(sucursalSeleccionada)        // Para INNER JOIN usuariosucursal
+                    .param(usuarioUpper)                // Usuario
                     .query((rs, rowNum) -> {
                         String storedPasswordHash = rs.getString("password");
                         
@@ -61,6 +64,7 @@ public class LoginRepository {
                                     .sucursal(rs.getString("sucursal"))
                                     .sucursalNombre(rs.getString("sucursal_nombre"))
                                     .idempresa(rs.getInt("idempresa"))
+                                    .empresaNombre(rs.getString("empresa_nombre"))
                                     .activo(rs.getBoolean("activo"))
                                     .perfil(rs.getString("perfil"))
                                     .build();

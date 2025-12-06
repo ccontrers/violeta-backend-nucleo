@@ -26,6 +26,7 @@ public class LoginResponse {
         private String sucursal;
         private String sucursalNombre;
         private Integer idempresa;
+        private String empresaNombre;
         private boolean activo;
         private String perfil;
     }
