@@ -31,7 +31,7 @@ import com.lavioleta.desarrollo.violetaserver.roles_sistema.service.RolesSistema
 @DisplayName("Web Layer: RolesSistemaController")
 class RolesSistemaControllerWebTest {
 
-    private static final String BASE = "/api/v1/roles-sistema";
+    private static final String BASE = "/api/v1/roles";
 
     @Autowired
     MockMvc mockMvc;
@@ -40,7 +40,7 @@ class RolesSistemaControllerWebTest {
     RolesSistemaService service;
 
     @Nested
-    @DisplayName("GET /api/v1/roles-sistema/combo-box")
+    @DisplayName("GET /api/v1/roles/combo-box")
     class ObtenerRolesParaCombo {
 
         @Test
